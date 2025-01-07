@@ -1,0 +1,7 @@
+# Lazy plugin lock file
+lazy-lock.json
+
+# Vim/Neovim
+~*
+*.swp
+.DS_Store
