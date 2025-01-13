@@ -17,5 +17,6 @@ return {
                 },
             },
         },
+        "SmiteshP/nvim-navic",
     },
 }

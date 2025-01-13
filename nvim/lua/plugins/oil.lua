@@ -1,6 +1,13 @@
 return {
+    --dir = "~/oil",
     "stevearc/oil.nvim",
+
+    --"JohnWilliston/oil",
+    --commit = "ba858b6",  -- The last known good oil commit.
+    --commit = "254bc6635cb3f77e6e9a89155652f368e5535160",  -- The commit that broke the plugin.
     cmd = { "Oil" },
+    -- -- Optional dependencies
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
         -- Oil will take over directory buffers (e.g. `vim .` or `:e src/`)
         -- Set to false if you still want to use netrw.
@@ -131,6 +138,4 @@ return {
             },
         },
     },
-    -- -- Optional dependencies
-    dependencies = { "nvim-tree/nvim-web-devicons" },
 }

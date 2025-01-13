@@ -125,5 +125,14 @@ return {
             )
         end,
     },
+    config = function (_, opts)
+        require("gitsigns").setup(opts)
+        -- customize the add/change/delete colors based on Tokyonight. This
+        -- way they match what I've done with the status line.
+        local colors = require("tokyonight.colors").setup()
+        vim.api.nvim_set_hl(0, "GitSignsAdd", { fg = colors.terminal.green_bright })
+        vim.api.nvim_set_hl(0, "GitSignsChange", { fg = colors.terminal.blue_bright })
+        vim.api.nvim_set_hl(0, "GitSignsDelete", { fg = colors.terminal.red })
+    end,
 }
 

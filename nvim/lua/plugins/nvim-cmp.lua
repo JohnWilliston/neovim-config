@@ -3,15 +3,15 @@ return {
     event = { "InsertEnter", "CmdlineEnter" },
     dependencies = {
         -- Autocompletion snippets plugin
-        "saadparwaiz1/cmp_luasnip",
+        { "saadparwaiz1/cmp_luasnip" },
         -- Completion sources
-        "hrsh7th/cmp-nvim-lsp", -- neovim builtin LSP client
-        "hrsh7th/cmp-path",     -- path
-        "hrsh7th/cmp-buffer",   -- buffer words
-        "hrsh7th/cmp-nvim-lua", -- nvim lua
-        "hrsh7th/cmp-emoji",    -- emoji
-        "hrsh7th/cmp-cmdline",  -- vim's cmdline.
-        "hrsh7th/cmp-calc",     -- doing simple calculations
+        { "hrsh7th/cmp-nvim-lsp" }, -- neovim builtin LSP client
+        { "hrsh7th/cmp-path" },     -- path
+        { "hrsh7th/cmp-buffer" },   -- buffer words
+        { "hrsh7th/cmp-nvim-lua" }, -- nvim lua
+        { "hrsh7th/cmp-emoji" },    -- emoji
+        { "hrsh7th/cmp-cmdline" },  -- vim's cmdline.
+        { "hrsh7th/cmp-calc" },     -- doing simple calculations
         --"hrsh7th/cmp-omni",     -- Nvim's omnifunc
 
         -- The following is the original plugin, which had issues, followed by
@@ -20,7 +20,9 @@ return {
         --"hrsh7th/cmp-nvim-lsp-document-symbol" -- improved searching through LSP data
         --{ dir = "~/src/cnlds-new" },
         --{ dir = "~/src/cnlds-original" },
-        "JohnWilliston/cmp-nvim-lsp-document-symbol",
+        { "JohnWilliston/cmp-nvim-lsp-document-symbol" },
+        -- { dir = "E:/Src/cmp-nvim-lsp-document-symbol" },
+        { "chrisgrieser/cmp_yanky" },
     },
     opts = function()
         local cmp = require("cmp")
@@ -118,6 +120,7 @@ return {
                         luasnip = "[LuaSnip]",
                         nvim_lua = "[Lua]",
                         latex_symbols = "[LaTeX]",
+                        cmp_yanky = "[Yank]",
                     })[entry.source.name]
                     return vim_item
                 end,
@@ -182,6 +185,13 @@ return {
                 { name = "emoji" },
                 { name = "omni" },
                 { name = "nvim_lsp_document_symbol" },
+                {
+                    name = "cmp_yanky",
+                    option = {
+                        onlyCurrentFiletype = false,
+                        minLength = 3,
+                    },
+                },
             })
         }
     end,

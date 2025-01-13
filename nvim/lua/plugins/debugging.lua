@@ -163,9 +163,9 @@ return {
                 dapui.close()
             end
 
-            require("nvim-dap-virtual-text").setup {
-                commented = true,
-            }
+            -- require("nvim-dap-virtual-text").setup ({
+            --     commented = true,
+            -- })
         end,
     },
     {
@@ -199,6 +199,15 @@ return {
             automatic_setup = true,
             handlers = {},
             ensure_installed = {},
+        },
+    },
+
+    {
+        "theHamsta/nvim-dap-virtual-text",
+        opts = {
+            commented = true,
+            highlight_changed_variables = true,
+            virt_text_pos = "inline",
         },
     },
 

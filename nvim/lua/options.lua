@@ -1,3 +1,5 @@
+-- vim.o and vim.opt change the same settings; the latter offers them as tables.
+
 -- Basic settings
 vim.o.number = true
 vim.o.relativenumber = true
@@ -12,6 +14,11 @@ vim.o.splitbelow = true
 vim.o.splitright = true
 vim.o.inccommand = "split"
 vim.o.termguicolors = true
+vim.o.undofile = true
+vim.o.wrap = false
+vim.o.swapfile = false
+vim.o.backup = false
+
 -- I find it's better to manage this through the toggleterm plugin.
 --vim.o.shell = "tcc.exe"
 
@@ -44,10 +51,13 @@ vim.o.exrc = true
 -- sometimes detecting a *.cpp file as filetype 'conf', which I believe is
 -- a sort of default "configuration file" type. I want all my *.cpp files to
 -- be detected as type 'cpp'.
-vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
-    pattern = {"*.cpp", "*.h"},
-    command = "set filetype=cpp",
-})
+-- vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
+--     pattern = {"*.cpp", "*.h"},
+--     command = "set filetype=cpp",
+-- })
+
+-- Defining my own custom variable to indicate I'm using a nerd font.
+vim.g.have_nerd_font = true
 
 -- Option customizations for running Neovide.
 if vim.g.neovide then

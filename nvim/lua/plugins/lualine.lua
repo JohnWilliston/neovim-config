@@ -22,6 +22,7 @@ end
 return {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
+    enabled = false,
     init = function()
         -- I'm adding a custom Vim global the idea for which I got from LazyVim.
         -- It shows the document symbols for the current cursor location from 

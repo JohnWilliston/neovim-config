@@ -11,13 +11,13 @@ if vim.g.neovide then
     keymap("n", "<C-s>", ":w<CR>", term_opts)           -- Save
     keymap("v", "<C-c>", "\"+y", term_opts)             -- Copy
 
-    keymap("n", "<C-v>", "\"+P", term_opts)             -- Paste normal mode
+    keymap("n", "<C-v>", "\"+p", term_opts)             -- Paste normal mode
     keymap("v", "<C-v>", "<C-r>+", term_opts)           -- Paste command mode
-    keymap("i", "<C-v>", "<ESC>\"+Pi", term_opts)       -- Paste insert mode
+    keymap("i", "<C-v>", "<ESC>\"+pi", term_opts)       -- Paste insert mode
 
-    keymap("n", "<S-Insert>", "\"+P", term_opts)        -- Paste normal mode
+    keymap("n", "<S-Insert>", "\"+p", term_opts)        -- Paste normal mode
     keymap("v", '<S-Insert>', "<C-r>+", term_opts)      -- Paste command mode
-    keymap("i", '<S-Insert>', "<ESC>\"+Pi", term_opts)  -- Paste insert mode
+    keymap("i", '<S-Insert>', "<ESC>\"+pi", term_opts)  -- Paste insert mode
 end
 
 -- Center vertically on the new line with control + u/d.
@@ -69,8 +69,19 @@ end, {silent = true})
 local wk = require("which-key")
 local splitjoin = require("splitjoin")
 local configutils = require("config-utils")
+configutils.hydra_frequent_options()
+local incremental_select = require("nvim-treesitter.incremental_selection")
+local ts_swap = require("nvim-treesitter.textobjects.swap")
+local ts_repeatmoves = require("nvim-treesitter.textobjects.repeatable_move")
 
 wk.add({
+
+    -- Incremental selection courtesy of tree sitter.
+    { "<leader>is", incremental_select.init_selection, desc = "Incremental selection begin", mode = "n" },
+    { "<C-n>", incremental_select.node_incremental, desc = "Increment by node", mode = "v" },
+    { "<C-p>", incremental_select.node_decremental, desc = "Decrement by node", mode = "v" },
+    { "<C-s>", incremental_select.scope_incremental, desc = "Increment by scope", mode = "v" },
+    { "<leader>`v", "`[v`]", desc = "Select last paste", mode = "n" },
 
     -- Note my custom buffer remove function. This should prevent neo-tree from 
     -- mistakenly expanding full screen or closing nvim on a ':bd' command.
@@ -119,6 +130,7 @@ wk.add({
 
     { "<leader>e", group = "Edit" }, -- group
     { "<leader>es", "<cmd>set spell!<CR>", desc = "Toggle spelling", mode = "n" },
+    { "<leader>ec", require("mini.colors").interactive, desc = "Mini colors", mode = "n" },
     { "<leader>eb<", "<cmd>BulletPromote<CR>", desc = "Promote bullet", mode = "n" },
     { "<leader>eb>", "<cmd>BulletDemote<CR>", desc = "Demote bullet", mode = "n" },
     { "<leader>ebr", "<cmd>RenumberSelection<CR>", desc = "Renumber selection", mode = "nv" },
@@ -126,6 +138,7 @@ wk.add({
     { "<leader>emc", "<cmd>lua require('codewindow').close_minimap()<CR>", desc = "Minimap close", mode = "n" },
     { "<leader>emf", "<cmd>lua require('codewindow').toggle_focus()<CR>", desc = "Minimap focus toggle", mode = "n" },
     { "<leader>emt", "<cmd>lua require('codewindow').toggle_minimap()<CR>", desc = "Minimap toggle", mode = "n" },
+    --{ "<leader>eo", configutils.hydra_frequent_options, desc = "Edit options", mode = "n" },
 
     { "<leader>f", group = "File" }, -- group
     { "<leader>fo", "<cmd>Oil .<CR>", desc = "Oil .", mode = "n" },
@@ -146,11 +159,19 @@ wk.add({
     { "<leader>g8",  ":lua require'harpoon.ui'.nav_file(8)<CR>", desc = "Goto Harpoon Mark 8", mode = "n" },
     { "<leader>g9",  ":lua require'harpoon.ui'.nav_file(9)<CR>", desc = "Goto Harpoon Mark 9", mode = "n" },
 
-    { "<leader>l", group = "LSP" },
+    { "<leader>l", group = "LSP / Treesitter" },
     { "<leader>lit", "<cmd>InspectTree<CR>", desc = "LSP inspect tree", mode = "n" },
     { "<leader>lgd", ":lua vim.lsp.buf.definition()<CR>", desc = "Goto Definition", mode = "n" },
     { "<leader>lgr", ":lua vim.lsp.buf.references()<CR>", desc = "Goto Definition", mode = "n" },
     { "<leader>lgi", ":lua vim.lsp.buf.implementation()<CR>", desc = "Goto Definition", mode = "n" },
+
+    -- I have these defined in the tree sitter text objects plugin spec for now.
+    -- { "<leader>xfn", "<cmd>TSTextobjectSwapNext @function.outer<CR>", desc = "Swap next function", mode = "n" },
+    -- { "<leader>xfp", "<cmd>TSTextobjectSwapPrevious @function.outer<CR>", desc = "Swap previous function", mode = "n" },
+    -- { "<leader>xpn", "<cmd>TSTextobjectSwapNext @parameter.inner<CR>", desc = "Swap next parameter", mode = "n" },
+    -- { "<leader>xpp", "<cmd>TSTextobjectSwapPrevious @parameter.inner<CR>", desc = "Swap previous parameter", mode = "n" },
+    { "<leader>;", ts_repeatmoves.repeat_last_move, desc = "Repeat last move", mode = "nxo" },
+    { "<leader>,", ts_repeatmoves.repeat_last_move_opposite, desc = "Repeat last move opposite", mode = "nxo" },
 
     { "<leader>m", group = "Marks / Harpoon" }, -- group
     { "<leader>ma", ":lua require'harpoon.mark'.add_file()<CR>", desc = "Add Harpoon Mark", mode = "n" },
@@ -158,7 +179,7 @@ wk.add({
 
     { "<leader>st", "<cmd>TodoTelescope<CR>", desc = "Todo Comments (Telescope)", mode = "n" },
 
-    { "<leader>t", group = "Terminal / Telescope" },
+    { "<leader>t", group = "Terminal / Tabs" },
     { "<leader>t\\", "<cmd>1ToggleTerm direction=float name=Popup<CR>", desc = "Terminal1 (Popup)", mode = "n" },
     { "<leader>th", "<cmd>2ToggleTerm direction=horizontal name=Horiztontal<CR>", desc = "Terminal2 (Horizontal)", mode = "n" },
     { "<leader>tv", "<cmd>3ToggleTerm direction=vertical name=Vertical<CR>", desc = "Terminal3 (Vertical)", mode = "n" },
@@ -196,12 +217,6 @@ wk.add({
     { "<leader>Wsfj", "<cmd>WinShift far_down<CR>", desc = "Window shift far down", mode = "n" },
     { "<leader>Wsfk", "<cmd>WinShift far_up<CR>", desc = "Window shift far up", mode = "n" },
 
-        { "<leader>n", group = "Notifications" }, -- group
-        { "<leader>nh", "<cmd>Noice history<CR>", desc = "Notification history", mode = "n" },
-        { "<leader>nd", "<cmd>Noice dismiss<CR>", desc = "Dismiss notifications", mode = "n" },
-        { "<leader>ne", "<cmd>Noice errors<CR>", desc = "Error notifications", mode = "n" },
-        { "<leader>nl", "<cmd>Noice last<CR>", desc = "Last notification", mode = "n" },
-        { "<leader>nt", "<cmd>Noice telescope<CR>", desc = "Notifications in telescope", mode = "n" },
 })
 
 -- I keep going back and forth on noice, so for now I'm adding binds conditionally.
@@ -215,4 +230,16 @@ if vim.g.noice then
         { "<leader>nt", "<cmd>Noice telescope<CR>", desc = "Notifications in telescope", mode = "n" },
     })
 end
+
+-- Yanky mappings
+-- NB: The special '<Plug>' use doesn't seem to work if you bind in which-key.
+vim.keymap.set({"n","x"}, "p", "<Plug>(YankyPutAfter)")
+vim.keymap.set({"n","x"}, "P", "<Plug>(YankyPutBefore)")
+vim.keymap.set({"n","x"}, "gp", "<Plug>(YankyGPutAfter)")
+vim.keymap.set({"n","x"}, "gP", "<Plug>(YankyGPutBefore)")
+vim.keymap.set("n", "<c-p>", "<Plug>(YankyPreviousEntry)")
+vim.keymap.set("n", "<c-n>", "<Plug>(YankyNextEntry)")
+
+wk.add({ "<leader>tf", configutils.fstat_test_1, desc = "Testing fstat", mode = "n" })
+
 

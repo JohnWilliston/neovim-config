@@ -3,24 +3,44 @@ return {
     dependencies = {
         "nvim-treesitter/nvim-treesitter",
     },
-    lazy = false,
+    lazy = true,
     opts = {
         textobjects = {
             select = {
                 enable = true,
+                lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
 
-                -- Automatically jump forward to textobj, similar to targets.vim
-                lookahead = true,
-
+                -- See https://github.com/nvim-treesitter/nvim-treesitter-textobjects?tab=readme-ov-file#built-in-textobjects
+                -- for the matrix of available text objects supported in various languages.
+                -- Watch video https://www.youtube.com/watch?v=CEMPq_r8UYQ
+                -- for a good tutorial on how to configure these methods.
                 keymaps = {
-                    -- You can use the capture groups defined in textobjects.scm
-                    ["af"] = "@function.outer",
-                    ["if"] = "@function.inner",
-                    ["ac"] = "@class.outer",
-                    -- You can optionally set descriptions to the mappings (used in the desc parameter of
-                    -- nvim_buf_set_keymap) which plugins like which-key display
-                    ["ic"] = { query = "@class.inner", desc = "Select inner part of a class region" },
-                    -- You can also use captures from other query groups like `locals.scm`
+                    ["a="] = { query = "@assignment.outer", desc = "An assignment" },
+                    ["i="] = { query = "@assignment.inner", desc = "Inner assignment" },
+                    ["l="] = { query = "@assignment.lhs", desc = "LHS assignment" },
+                    ["r="] = { query = "@assignment.rhs", desc = "RHS assignment" },
+
+                    ["af"] = { query = "@function.outer", desc = "A function" },
+                    ["if"] = { query = "@function.inner", desc = "Inner function" },
+
+                    ["ac"] = { query = "@class.outer", desc = "A class" },
+                    ["ic"] = { query = "@class.inner", desc = "Inner class" },
+
+                    ["ap"] = { query = "@parameter.outer", desc = "A parameter" },
+                    ["ip"] = { query = "@parameter.inner", desc = "Inner parameter" },
+
+                    ["ai"] = { query = "@conditional.outer", desc = "A conditional" },
+                    ["ii"] = { query = "@conditional.inner", desc = "Inner conditional" },
+
+                    ["al"] = { query = "@loop.outer", desc = "A loop" },
+                    ["il"] = { query = "@loop.inner", desc = "Inner loop" },
+
+                    ["aj"] = { query = "@call.outer", desc = "A jump" },
+                    ["ij"] = { query = "@call.inner", desc = "Inner jump" },
+
+                    ["a/"] = { query = "@comment.outer", desc = "A comment" },
+                    ["i/"] = { query = "@comment.inner", desc = "Inner comment" },
+
                     ["as"] = { query = "@scope", query_group = "locals", desc = "Select language scope" },
                 },
                 -- You can choose the select mode (default is charwise 'v')
@@ -49,21 +69,26 @@ return {
             swap = {
                 enable = true,
                 swap_next = {
-                    ["<leader>a"] = "@parameter.inner",
+                    ["<leader>xcn"] = "@class.outer",
+                    ["<leader>xfn"] = "@function.outer",
+                    ["<leader>xpn"] = "@parameter.inner",
                 },
                 swap_previous = {
-                    ["<leader>A"] = "@parameter.inner",
+                    ["<leader>xcp"] = "@class.outer",
+                    ["<leader>xfp"] = "@function.outer",
+                    ["<leader>xpp"] = "@parameter.inner",
                 },
             },
             move = {
                 enable = true,
                 set_jumps = true, -- whether to set jumps in the jumplist
                 goto_next_start = {
-                    ["]m"] = "@function.outer",
-                    ["]]"] = { query = "@class.outer", desc = "Next class start" },
+                    ["]c"] = { query = "@class.outer", desc = "Next class" },
+                    ["]f"] = { query = "@function.outer", desc = "Next function" },
+                    ["]p"] = { query = "@parameter.inner", desc = "Next parameter" },
                     --
                     -- You can use regex matching (i.e. lua pattern) and/or pass a list in a "query" key to group multiple queries.
-                    ["]o"] = "@loop.*",
+                    ["]l"] = "@loop.*",
                     -- ["]o"] = { query = { "@loop.inner", "@loop.outer" } }
                     --
                     -- You can pass a query group to use query from `queries/<lang>/<query_group>.scm file in your runtime path.
@@ -72,16 +97,16 @@ return {
                     ["]z"] = { query = "@fold", query_group = "folds", desc = "Next fold" },
                 },
                 goto_next_end = {
-                    ["]M"] = "@function.outer",
-                    ["]["] = "@class.outer",
+                    ["]F"] = "@function.outer",
+                    ["]C"] = "@class.outer",
                 },
                 goto_previous_start = {
-                    ["[m"] = "@function.outer",
-                    ["[["] = "@class.outer",
+                    ["[f"] = "@function.outer",
+                    ["[c"] = "@class.outer",
                 },
                 goto_previous_end = {
-                    ["[M"] = "@function.outer",
-                    ["[]"] = "@class.outer",
+                    ["[F"] = "@function.outer",
+                    ["[C"] = "@class.outer",
                 },
                 -- Below will go to either the start or the end, whichever is closer.
                 -- Use if you want more granular movements
@@ -100,7 +125,7 @@ return {
     -- if you don't keep this line here.
     -- TODO: Figure out some better way to configure this.
     config = function(_, opts)
-        require"nvim-treesitter.configs".setup(opts)
+        require("nvim-treesitter.configs").setup(opts)
     end,
 }
 

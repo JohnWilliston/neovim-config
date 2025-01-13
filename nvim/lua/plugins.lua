@@ -15,7 +15,9 @@ return {
         config = true,
     },
     {
-        'kosayoda/nvim-lightbulb',
+        "kosayoda/nvim-lightbulb",
+        --dir = "E:/Src/nvim-lightbulb",
+        --"JohnWilliston/nvim-lightbulb",
         opts = {
             autocmd = { enabled = true }
         }
@@ -103,6 +105,51 @@ return {
     },
     {
         "sindrets/winshift.nvim",
+    },
+
+    -- Note that yanky includes a completion plugin integration for nvim-cmp.
+    {
+        "gbprod/yanky.nvim",
+        opts = {
+            ring = {
+                history_length = 20,    -- I can't imagine needing more entries
+            },
+        },
+    },
+    {
+        "dstein64/vim-startuptime",
+        cmd = "StartupTime",
+        event = "VeryLazy",
+    },
+    -- A few things worth noting:
+    --  1. You use one of those two commands to create a new table or edit one.
+    --  2. You have to save your changes with the `ExportTable` command.
+    --  3. There are a number of other commands to insert rows and such.
+    -- It's a nice plugin, but I wish it provided better/more keymaps.
+    {
+        "Myzel394/easytables.nvim",
+        cmd = { "EasyTablesCreateNew", "EasyTablesImportThisTable" },
+        ft = "markdown",
+        lazy = true,
+        config = true,
+    },
+    {
+        "echasnovski/mini.nvim",
+        config = function ()
+            require("mini.cursorword").setup()
+            -- I like the current word underlined.
+            vim.api.nvim_set_hl(0, "MiniCursorwordCurrent", { underline = true })
+            --vim.cmd([[hi MiniCursorwordCurrent gui=underline]])
+            --require("mini.indentscope").setup()
+            --require("mini.tabline").setup()
+            require('mini.colors').setup()
+        end,
+    },
+    {
+        "norcalli/nvim-colorizer.lua",
+        config = function ()
+           require("colorizer").setup()
+        end,
     },
 }
 
