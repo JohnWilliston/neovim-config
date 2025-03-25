@@ -1,3 +1,8 @@
+-- Make sure to setup `mapleader` and `maplocalleader` before
+-- loading lazy.nvim so that mappings are correct.
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
+
 -- vim.o and vim.opt change the same settings; the latter offers them as tables.
 
 -- Basic settings
@@ -18,6 +23,15 @@ vim.o.undofile = true
 vim.o.wrap = false
 vim.o.swapfile = false
 vim.o.backup = false
+vim.o.colorcolumn="81"
+
+-- Diagnosing my weird backspace issues.
+-- vim.opt.backspace = { "indent", "eol", "start" }
+-- vim.cmd("noremap <BS> x")
+
+-- A couple settings recommended by folke's edgy plugin.
+vim.o.laststatus = 3
+vim.o.splitkeep = "screen"
 
 -- I find it's better to manage this through the toggleterm plugin.
 --vim.o.shell = "tcc.exe"
@@ -33,7 +47,7 @@ vim.cmd("filetype plugin indent on")
 
 -- Enable default clipping to the system clipboard.
 --vim.api.nvim_set_option("clipboard", "unnamedplus")
-vim.opt.clipboard:append { "unnamed", "unnamedplus" }
+vim.opt.clipboard:append { "unnamedplus", "unnamed" }
 
 -- Enable virtual editing to let the cursor go where no text exists when in block mode.
 vim.o.virtualedit = "block"
@@ -51,18 +65,43 @@ vim.o.exrc = true
 -- sometimes detecting a *.cpp file as filetype 'conf', which I believe is
 -- a sort of default "configuration file" type. I want all my *.cpp files to
 -- be detected as type 'cpp'.
--- vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
---     pattern = {"*.cpp", "*.h"},
---     command = "set filetype=cpp",
--- })
+vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
+    pattern = {"*.cpp", "*.cxx", "*.h"},
+    command = "set filetype=cpp",
+})
 
 -- Defining my own custom variable to indicate I'm using a nerd font.
 vim.g.have_nerd_font = true
 
 -- Option customizations for running Neovide.
 if vim.g.neovide then
-    local fontName = vim.loop.os_uname().sysname == "Windows_NT" and "0xProto Nerd Font:h12" or "0xProto:h16"
-    --vim.o.guifont="0xProto:h16"
+    local fontName = "0xProto Nerd Font:h12"
+    -- We boost the size on macOS, presumably due to the higher DPI or something.
+    if vim.loop.os_uname().sysname == "Darwin" then
+        fontName =  "0xProto Nerd Font:h16"
+    end
     vim.o.guifont = fontName
 end
+
+-- This helpful little gem lets me redirect command output to a buffer.
+-- https://www.reddit.com/r/neovim/comments/zhweuc/whats_a_fast_way_to_load_the_output_of_a_command/
+vim.api.nvim_create_user_command('Redir', function(ctx)
+    -- I find I can successfully dump messages to a file with:
+    -- :redir >~/tmp.txt
+    -- :silent messages
+    -- :redir end
+    -- Maybe there's some way to do that nicely with Vim script?
+    local output = vim.api.nvim_exec2(ctx.args, { output = true })
+    vim.print(output)
+    local lines = vim.split(output.output, '\n')
+    vim.cmd('new')
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+    vim.opt_local.modified = false
+end, { nargs = '+', complete = 'command' })
+
+-- Gives Neovim a place to add custom spelling words (bound to 'zg')
+vim.o.spellfile = vim.fn.stdpath("config") .. "/dictionary.utf-8.add" 
+
+-- Required by the scope plugin to add globals. The rest is the defaults.
+vim.opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,terminal,globals"
 

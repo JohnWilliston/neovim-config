@@ -1,1 +1,5 @@
+# NB: The character to separate is actually a pipe.
+# It just looks like a forward slash but isn't.
+
+curl | :CurlOpen
 xmas | :MerryChristmas

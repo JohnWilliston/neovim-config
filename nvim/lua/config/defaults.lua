@@ -1,62 +1,112 @@
 return {
-    -- icons used by other plugins
     icons = {
+        misc = {
+            dots = "󰇘",
+        },
+        dap = {
+            Stopped             = { "󰁕 ", "DiagnosticWarn", "DapStoppedLine" },
+            -- I use the health error group to make it red; cyan otherwise.
+            Breakpoint          = { " ", "healthError" },
+            BreakpointCondition = " ",
+            BreakpointRejected  = { " ", "DiagnosticError" },
+            LogPoint            = ".>",
+        },
         diagnostics = {
             Error = "󰅚 ", --🅴," ""󰢃 "
             Warn = "󰀪 ", --🆆," "
-            Hint = "󰌶", --🅸," " "󰛩 "
+            Hint = "󰌶", --🅸," " "󰛩 " "󰌵",
             Info = " ", --🅷," ","󰗡 "
         },
-        debugger = {
-            DapBreakpoint = " ", --▶️breakpoints
-            DapBreakpointCondition = " ", --conditional breakpoints
-            DapLogPoint = " ", --log points
-            DapStopped = " ", --🟥indicate where the debugee is stopped
-            DapBreakpointRejected = " ", --indicate breakpoints rejected by the debug
-        },
         git = {
-            add = { text = "│" }, --" ","▎"
-            change = { text = "!" }, --" ",
-            delete = { text = "_" }, --" ",""
+            added    = " ",
+            modified = " ",
+            removed  = " ",
+            -- add = { text = "│" }, --" ","▎"
+            -- change = { text = "!" }, --" ",
+            -- delete = { text = "_" }, --" ",""
             topdelete = { text = "‾" },
             changedelete = { text = "~" },
             untracked = { text = "┆" },
         },
+
         kinds = {
-            Array = " ",
-            Boolean = " ",
-            Class = " ", --"󰠱 ",
-            Color = "  ", --"󰏘 ", "󰸌 "
-            Constant = " ",
-            Constructor = "",
-            Copilot = " ",
-            Enum = " ",
-            EnumMember = "",
-            Event = " ", --"",
-            Field = "󰄶 ", --"󰘻 ","󰄷 "
-            File = "󰈙", -- 󰷈 󱪗 󱪝
-            Folder = "  ", --󰉋  
-            Function = "󰊕", --"󰡱 "
-            Interface = " ", --"",
-            Keyword = "󰌋 ", --"󱕵"
-            Method = "󰆧 ",
-            Module = " ",
-            Namespace = " ",
-            Null = " ",
-            Number = " ",
-            Object = " ",
-            Operator = " ", --"󰆕",
-            Package = "󰏗 ",
-            Property = " ", --" ",󱉯
-            Reference = " ", --"",
-            Snippet = " ",
-            String = " ",
-            Struct = " ", --" ",
-            Text = "󰊄 ", --" ",󰚞
+            Array         = " ",
+            Boolean       = "󰨙 ",
+            Class         = " ",
+            Codeium       = "󰘦 ",
+            Color         = " ",
+            Control       = " ",
+            Collapsed     = " ",
+            Constant      = "󰏿 ",
+            Constructor   = " ",
+            Copilot       = " ",
+            Enum          = " ",
+            EnumMember    = " ",
+            Event         = " ",
+            Field         = " ",
+            File          = " ",
+            Folder        = " ",
+            Function      = "󰊕 ",
+            Interface     = " ",
+            Key           = " ",
+            Keyword       = " ",
+            Method        = "󰊕 ",
+            Module        = " ",
+            Namespace     = "󰦮 ",
+            Null          = " ",
+            Number        = "󰎠 ",
+            Object        = " ",
+            Operator      = " ",
+            Package       = " ",
+            Property      = " ",
+            Reference     = " ",
+            Snippet       = "󱄽 ",
+            String        = " ",
+            Struct        = "󰆼 ",
+            Supermaven    = " ",
+            TabNine       = "󰏚 ",
+            Text          = " ",
             TypeParameter = " ",
-            Unit = " ", --"",
-            Value = "󰎠",
-            Variable = "󰘛 ",
+            Unit          = " ",
+            Value         = " ",
+            Variable      = "󰀫 ",
+        },
+
+        ---@type table<string, string[]|boolean>?
+        kind_filter = {
+            default = {
+                "Class",
+                "Constructor",
+                "Enum",
+                "Field",
+                "Function",
+                "Interface",
+                "Method",
+                "Module",
+                "Namespace",
+                "Package",
+                "Property",
+                "Struct",
+                "Trait",
+            },
+            markdown = false,
+            help = false,
+            -- you can specify a different filter for each filetype
+            lua = {
+                "Class",
+                "Constructor",
+                "Enum",
+                "Field",
+                "Function",
+                "Interface",
+                "Method",
+                "Module",
+                "Namespace",
+                -- "Package", -- remove package since luals uses it for control flow structures
+                "Property",
+                "Struct",
+                "Trait",
+            },
         },
     },
     -- options from nvim_open_win()| vim.diagnostic.open_float()

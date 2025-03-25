@@ -15,17 +15,25 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Make sure to setup `mapleader` and `maplocalleader` before
--- loading lazy.nvim so that mappings are correct.
--- This is also a good place to setup other settings (vim.opt)
-vim.g.mapleader = " "
-vim.g.maplocalleader = "\\"
-
 -- Setup lazy.nvim
 require("lazy").setup({
+    -- This gets rid of the annoying popup about how configuration has changed.
+    change_detection = {
+        notify = false,
+    },
+
+    -- This departs from the recommended copy/paste code on the web site so
+    -- I can structure my plugins the way I want. The import key will take only
+    -- a single string, but you can define multiple commands by providing more
+    -- sub-tables in the spec table. The following page is helpful:
+    -- https://lazy.folke.io/usage/structuring#%EF%B8%8F-importing-specs-config--opts
     spec = {
-        -- import your plugins
-        { import = "plugins" },
+        -- Add this back if you someday have plugin specs in just the plugins
+        -- folder again.
+        -- { import = "plugins", },
+        { import = "plugins.features", },
+        { import = "plugins.lsp", },
+        { import = "plugins.ui", },
     },
     -- Configure any other settings here. See the documentation for more details.
     -- colorscheme that will be used when installing plugins.
@@ -33,6 +41,6 @@ require("lazy").setup({
     -- automatically check for plugin updates
     checker = { enabled = true },
     rocks = {
-        enabled = false,
+        enabled = false,    -- Haven't found a need, and it doesn't work anyway.
     },
 })
