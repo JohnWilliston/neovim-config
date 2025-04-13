@@ -30,7 +30,7 @@ return {
         },
         init = function()
             -- I ditched all the stuff I had previously written in favor of the
-            -- following from the LazyVim disto which is so much better.
+            -- following from the LazyVim disto is so much better.
             local defaults = require("config.defaults")
             for name, sign in pairs(defaults.icons.dap) do
                 sign = type(sign) == "table" and sign or { sign }
@@ -165,7 +165,46 @@ return {
             virt_text_pos = "inline",
         },
     },
-
+    {
+        "jbyuki/one-small-step-for-vimkind",
+        keys = {
+            { "<leader>dl", function () require("osv").launch({port = 8086}) end, desc = "Debug Lua in Neovim" },
+        },
+        -- config = function()
+        --     local dap = require("dap")
+        --     dap.adapters.nlua = function(callback, conf)
+        --         local adapter = {
+        --             type = "server",
+        --             host = conf.host or "127.0.0.1",
+        --             port = conf.port or 8086,
+        --         }
+        --         if conf.start_neovim then
+        --             local dap_run = dap.run
+        --             dap.run = function(c)
+        --                 adapter.port = c.port
+        --                 adapter.host = c.host
+        --             end
+        --             require("osv").run_this()
+        --             dap.run = dap_run
+        --         end
+        --         callback(adapter)
+        --     end
+        --     dap.configurations.lua = {
+        --         {
+        --             type = "nlua",
+        --             request = "attach",
+        --             name = "Run this file",
+        --             start_neovim = {},
+        --         },
+        --         {
+        --             type = "nlua",
+        --             request = "attach",
+        --             name = "Attach to running Neovim instance (port = 8086)",
+        --             port = 8086,
+        --         },
+        --     }
+        -- end,
+    },
     -- TODO: See if this cocks up my other nvim-cmp setup!
     { -- optional cmp completion source for require statements and module annotations
         "hrsh7th/nvim-cmp",

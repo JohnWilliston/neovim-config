@@ -1,4 +1,5 @@
 return {
+    -- My primary preferred color scheme with a few tweaks.
     {
         "folke/tokyonight.nvim",
         lazy = false,
@@ -41,7 +42,7 @@ return {
             -- vim.cmd([[colorscheme kanagawa]])
         end
     },
-
+    -- Other color schemes I like to use from time to time.
     { "rebelot/kanagawa.nvim", enabled = true, lazy = false, priority = 50, opts = {} },
     { "Mofiqul/vscode.nvim",   enabled = true, lazy = false, priority = 50, opts = {} },
     { "navarasu/onedark.nvim", enabled = true, lazy = false, priority = 50, opts = {} },

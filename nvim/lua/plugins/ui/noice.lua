@@ -23,6 +23,10 @@ return {
        vim.g.noice = true
     end,
     opts = {
+        cmdline = {
+            enabled = true,
+            view = "cmdline_popup",
+        },
         lsp = {
             -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
             override = {
@@ -33,18 +37,27 @@ return {
         },
         -- you can enable a preset for easier configuration
         presets = {
-            bottom_search = true, -- use a classic bottom cmdline for search
+            bottom_search = false, -- use a classic bottom cmdline for search
             command_palette = true, -- position the cmdline and popupmenu together
             long_message_to_split = true, -- long messages will be sent to a split
             inc_rename = false, -- enables an input dialog for inc-rename.nvim
             lsp_doc_border = false, -- add a border to hover docs and signature help
         },
-        -- I guess this is supposed to help Noice show macro recording (and 
-        -- maybe other?) notifications, but it doesn't seem to help. I had to
-        -- add some configuration to lualine to show the recording notification.
-        -- routes = {
-        --     view = "notify",
-        --     filter = {event = "msg_showmode" },
-        -- },
+        routes = {
+            -- Enables mode messages, like macro recording. I have a status line
+            -- indicator, so I'm not using it for now.
+            -- {
+            --     view = "notify",
+            --     filter = { event = "msg_showmode" },
+            -- },
+            {
+                filter = {
+                    event = "msg_show",
+                    kind = "",
+                    find = "",
+                },
+                opts = { skip = true },
+            },
+        },
     },
 }

@@ -168,6 +168,13 @@ return {
                 }
             },
             defaults = {
+                layout_strategy = "horizontal",
+                layout_config = {
+                    horizontal = { height = 0.9, width = 0.9 },
+                    vertical = { height = 0.9, width = 0.9 },
+                    preview_width = 0.7,
+                    prompt_position = "bottom", 
+                },
                 prompt_prefix = " ",
                 selection_caret = " ",
                 mappings = {

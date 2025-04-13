@@ -1,4 +1,7 @@
 local configutils = require("utils.config-utils")
+local is_git_repo = function() return configutils.is_git_repo() end
+-- local is_git_repo = function() return Snacks.git.get_root() ~= nil end
+local github_cli_found = function() return vim.fn.executable("gh") ~= 0 end
 
 return {
     "folke/snacks.nvim",
@@ -185,7 +188,7 @@ return {
                     section = "recent_files",
                     indent = 2,
                     padding = 1,
-                    limit = configutils.is_git_repo() and 5 or 20,
+                    limit = (github_cli_found() and is_git_repo()) and 5 or 20,
                 },
                 {
                     pane = 2,
@@ -194,7 +197,7 @@ return {
                     section = "projects",
                     indent = 2,
                     padding = 1,
-                    limit = configutils.is_git_repo() and 5 or 10,
+                    limit = (github_cli_found() and is_git_repo()) and 5 or 10,
                 },
                 -- {
                 --     pane = 2,
@@ -211,8 +214,10 @@ return {
                 --     indent = 3,
                 -- },
 
+                -- BUG: This option still shows up sometimes on the dashboard 
+                -- when in non-git repo directories, which I don't fathom.
                 {
-                    enabled = configutils.is_git_repo(),
+                    enabled = is_git_repo(),
                     pane = 2,
                     icon = " ",
                     desc = "Browse Repo",
@@ -222,10 +227,12 @@ return {
                         Snacks.gitbrowse()
                     end,
                 },
+
                 function()
                     local in_git = Snacks.git.get_root() ~= nil
                     local cmds = {
                         {
+                            enabled = github_cli_found(),
                             icon = " ",
                             title = "GitHub Account",
                             cmd = "gh auth status --active",
@@ -238,19 +245,7 @@ return {
                             end
                         },
                         {
-                            icon = " ",
-                            title = "Git Status",
-                            section = "terminal",
-                            enabled = function()
-                                return Snacks.git.get_root() ~= nil
-                            end,
-                            cmd = "git status --short --branch --renames",
-                            height = 5,
-                            padding = 1,
-                            ttl = 5 * 60,
-                            indent = 3,
-                        },
-                        {
+                            enabled = github_cli_found(),
                             title = "Notifications",
                             cmd = "gh notify -s -a -n3",
                             action = function()
@@ -262,6 +257,18 @@ return {
                             ttl = 30,
                         },
                         {
+                            icon = " ",
+                            title = "Git Status",
+                            section = "terminal",
+                            enabled = in_git,
+                            cmd = "git status --short --branch --renames",
+                            height = 5,
+                            padding = 1,
+                            ttl = 5 * 60,
+                            indent = 3,
+                        },
+                        {
+                            enabled = is_git_repo() and github_cli_found(),
                             title = "Open Issues",
                             cmd = "gh issue list -L 3",
                             key = "i",
@@ -273,6 +280,7 @@ return {
                             ttl = 30,
                         },
                         {
+                            enabled = is_git_repo() and github_cli_found(),
                             icon = " ",
                             title = "Open PRs",
                             cmd = "gh pr list -L 3",
@@ -295,7 +303,7 @@ return {
                         return vim.tbl_extend("force", {
                             pane = 2,
                             section = "terminal",
-                            enabled = in_git,
+                            enabled = github_cli_found(),
                             padding = 1,
                             ttl = 5 * 60,
                             indent = 3,

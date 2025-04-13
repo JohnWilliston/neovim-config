@@ -12,6 +12,5 @@ return {
         { "<leader>vo", "<cmd>DiffviewOpen origin/master..HEAD<CR>", desc = "Diff to origin/master", mode = "n" },
         { "<leader>vO", "<cmd>DiffviewOpen origin/main..HEAD<CR>", desc = "Diff to origin/main", mode = "n" },
         { "<leader>vq", "<cmd>DiffviewClose<CR>", desc = "Close diff", mode = "n" },
-
     },
 }

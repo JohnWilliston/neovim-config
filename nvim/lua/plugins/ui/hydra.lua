@@ -25,7 +25,6 @@ local function hydra_dap_menu()
             color = "pink",
             invoke_on_body = true,
             hint = {
-                border = "rounded",
                 position = "middle-right",
             },
         },
@@ -92,7 +91,6 @@ local function hydra_frequent_options()
             color = "amaranth",
             invoke_on_body = true,
             hint = {
-                border = "rounded",
                 position = "middle"
             }
         },
@@ -167,24 +165,45 @@ local function hydra_frequent_options()
 
 end
 
+-- Some notes are in order about the following hydras. Some were largely taken
+-- from the main hydra documentation while others are my own creation. I 
+-- particularly like the way the technique aids in simple tasks like switching 
+-- window panes without repeatedly hitting <C-w> as a prefix every time.
+--
+-- First, my use of the pink color means it ignores "foreign keys", which refers 
+-- to keys not supported by the hydra itself. By default (a "red" hydra), those 
+-- will stop the hydra and execute whatever is normally bound to that key, but 
+-- I prefer the process to exit *only* with the escape key, which pink does.
+--
+-- Second, the use of the "invoke_on_body" is what lets the which-key plugin
+-- show the description in its nice helpful popup window for key bind help.
+--
+-- Third, the different values for the hint type are sometimes different because
+-- that helps keep the hint visible while the hydra is open.
+
 local function hydra_window_resize()
     return {
-        name = "Resize",
+        name = "Hydra Resize",
         mode = "n",
         body = "<leader>wr",
         -- The invoke on body is what lets which-key show the description.
         config = {
+            color = "pink",
             invoke_on_body = true,
+            -- This makes the hint appear properly when using noice.
+            hint = {
+                type = "statusline",
+            },
         },
         heads = {
             { "h", "<C-w><" },
             { "l", "<C-w>>", { desc = "-/+" } },
             { "H", "5<C-w><" },
             { "L", "5<C-w>>", { desc = "5-/+" } },
-            { "j", "<C-w>-" },
-            { "k", "<C-w>+", { desc = "-/+" } },
-            { "J", "3<C-w>-" },
-            { "K", "3<C-w>+", { desc = "3-/+" } },
+            { "j", "<cmd>resize +1<cr>" },
+            { "k", "<cmd>resize -1<cr>", { desc = "-/+" } },
+            { "J", "<cmd>resize +3<cr>" },
+            { "K", "<cmd>resize -3<cr>", { desc = "3-/+" } },
             { "=", "<C-w>=-", { desc = "equalize" } },
         }
     }
@@ -192,12 +211,16 @@ end
 
 local function hydra_window_pan()
     return {
-       name = "Pan",
+       name = "Hydra Pan",
        mode = "n",
        body = "<leader>wp",
-        -- The invoke on body is what lets which-key show the description.
         config = {
+            color = "pink",
             invoke_on_body = true,
+            -- This makes the hint appear properly when using noice.
+            hint = {
+                type = "statusline",
+            },
         },
        heads = {
           { "h", "5zh" },
@@ -210,12 +233,16 @@ end
 
 local function hydra_window_move()
     return {
-       name = "Move",
+       name = "Hydra Move",
        mode = "n",
        body = "<leader>wm",
-        -- The invoke on body is what lets which-key show the description.
         config = {
+            color = "pink",
             invoke_on_body = true,
+            -- This makes the hint appear properly when using noice.
+            hint = {
+                type = "statusline",
+            },
         },
        heads = {
           { "h", "<cmd>WinShift left<cr>" },
@@ -228,12 +255,18 @@ end
 
 local function hydra_window_navigate()
     return {
-       name = "Navigate",
+       name = "Hydra Navigate",
        mode = "n",
        body = "<leader>wn",
-        -- The invoke on body is what lets which-key show the description.
         config = {
+            color = "pink",
             invoke_on_body = true,
+            -- This makes the hint appear properly when using noice. NB: the 
+            -- status line won't work for navigation unless it's in every 
+            -- window, so we use the window instead.
+            hint = {
+                type = "window",
+            },
         },
        heads = {
           { "h", "<cmd>wincmd h<cr>" },
@@ -245,7 +278,9 @@ local function hydra_window_navigate()
 end
 
 return {
-    "anuvyklack/hydra.nvim",
+    -- "anuvyklack/hydra.nvim",     -- The original hydra plugin
+    -- dir = "E:/Src/hydra.nvim",   -- My own source for debugging
+    "nvimtools/hydra.nvim",         -- The updated and maintained version (yay!)
     event = "VeryLazy",
     config = function(_, _)
         local hydra = require("hydra")
@@ -253,8 +288,8 @@ return {
         hydra(hydra_frequent_options())
         hydra(hydra_window_resize())
         hydra(hydra_window_pan())
-        hydra(hydra_window_move())
         hydra(hydra_window_navigate())
+        hydra(hydra_window_move())
     end,
 }
 

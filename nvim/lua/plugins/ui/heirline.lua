@@ -628,6 +628,28 @@ return {
 			},
 		}
 
+        -- Not sure why I could never get this working at all.
+        local hydraBlock = {
+            static = {
+                evalCount = 0
+            },
+            -- condition = require("hydra.statusline").is_active(),
+            -- provider = "HAIL HYDRA!!!",
+            -- provider = require("hydra.statusline").get_hint(),
+            provider = function(self)
+                self.evalCount = self.evalCount + 1
+                local active = require("hydra.statusline").is_active()
+                local hydraName = require("hydra.statusline").get_name()
+                local color = require("hydra.statusline").get_color()
+                return string.format("Hydra: %d active(%s) name(%s) ", self.evalCount, active, hydraName)
+            end,
+            hl = { fg = colors.bright_green },
+            update = "CursorMoved",
+            -- update = function ()
+            --     require("hydra.statusline").is_active()
+            -- end,
+        }
+
 		local finalStatusLine = {
 			hl = { fg = "fg", bg = "bg" },
 			modeBlock1,
@@ -639,6 +661,7 @@ return {
 			fileNameBlock,
 			singleSpace,
 			--troubleSymbols,
+            -- hydraBlock, 
 			navicSymbolsBlock,
 			lib.component.fill(),
 			aiCodeCompanionBlock,
