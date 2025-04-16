@@ -61,15 +61,6 @@ vim.g.loaded_perl_provider = 0
 -- Finally, enable the exrc feature for project-folder-specific settings.
 vim.o.exrc = true
 
--- I added this auto command to override file detection because Neovim was 
--- sometimes detecting a *.cpp file as filetype 'conf', which I believe is
--- a sort of default "configuration file" type. I want all my *.cpp files to
--- be detected as type 'cpp'.
-vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
-    pattern = {"*.cpp", "*.cxx", "*.h"},
-    command = "set filetype=cpp",
-})
-
 -- Defining my own custom variable to indicate I'm using a nerd font.
 vim.g.have_nerd_font = true
 

@@ -7,7 +7,7 @@ return {
     keys = {
         { "<leader>bd", "<cmd>Bdelete<cr>", desc = "Buffer delete" },
         { "<leader>ba", "<cmd>bufdo Bdelete<cr>", desc = "Buffer delete all" },
-        -- TODO: Slightly less than ideal as you lose your line number. Hmph.
-        { "<leader>bo", '<cmd>bufdo Bdelete<cr><cmd>e#<cr>', desc = "Buffer delete others" },
+        -- Details on this cool command here: https://www.reddit.com/r/neovim/comments/s7m0xg/how_to_close_all_other_buffers_except_the_current/
+        { "<leader>bo", '<cmd>%bdelete|edit #|normal`"<cr>', desc = "Buffer delete others" },
     },
 }

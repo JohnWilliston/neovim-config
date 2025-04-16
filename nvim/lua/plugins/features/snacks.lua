@@ -1,3 +1,4 @@
+local cmp = require("cmp")
 local configutils = require("utils.config-utils")
 local is_git_repo = function() return configutils.is_git_repo() end
 -- local is_git_repo = function() return Snacks.git.get_root() ~= nil end
@@ -27,8 +28,16 @@ return {
                 -- My own custom global used by the nvim-cmp plugin.
                 Snacks.toggle({ 
                     name = "Completion", 
-                    get = function() return vim.g.cmp end,
-                    set = function(state) vim.g.cmp = state end,
+                    -- get = function() return vim.g.cmp end,
+                    -- set = function(state) vim.g.cmp = state end,
+                    get = function() 
+                        local bufnr = vim.api.nvim_get_current_buf()
+                        return configutils.is_buffer_completion_enabled(bufnr)
+                    end,
+                    set = function(state) 
+                        configutils.enable_buffer_completion(0, state)
+                        -- cmp.setup.buffer({ enabled = state })
+                    end,
                 }):map("<leader>uc")
                 Snacks.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 }):map("<leader>ue")
                 Snacks.toggle.diagnostics():map("<leader>ud")

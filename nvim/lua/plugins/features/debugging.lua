@@ -205,6 +205,7 @@ return {
         --     }
         -- end,
     },
+
     -- TODO: See if this cocks up my other nvim-cmp setup!
     { -- optional cmp completion source for require statements and module annotations
         "hrsh7th/nvim-cmp",
@@ -216,6 +217,7 @@ return {
             })
         end,
     },
+
     -- { -- optional blink completion source for require statements and module annotations
     --     "saghen/blink.cmp",
     --     opts = {
