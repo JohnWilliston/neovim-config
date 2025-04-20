@@ -210,5 +210,34 @@ function M.enable_buffer_completion(bufnr, value)
     vim.api.nvim_buf_set_var(bufnr, vim.g.completion_buffer_variable, value)
 end
 
+-- The following functions encapsulate managing font size for me. They're not
+-- normally needed but are when using Neovide for example.
+
+local function parse_font(guifont)
+    local index = string.find(guifont, "[^:]:h")
+    if (index == nil) then return index end
+
+    -- Normal guifont format is [name]:h[size], so we just break off the name
+    -- and grab the current size a few characters later.
+    local name = string.sub(guifont, 1, index)
+    local size = tonumber(string.sub(guifont, index + 3))
+
+    return { name = name, size = size }
+end
+
+function M.adjust_font_size(amount)
+    local f = parse_font(vim.o.guifont)
+    if (f == nil) then
+        vim.notify("Error: could not parse current font!", vim.log.levels.ERROR)
+        return
+    end
+    local newSize = f.size + amount
+    local guards = { min = 8, max = 20 }
+    if (newSize < guards.min) then newSize = guards.min end
+    if (newSize > guards.max) then newSize = guards.max end
+    local newFont = string.format("%s:h%d", f.name, newSize)
+    vim.o.guifont = newFont
+end
+
 return M
 

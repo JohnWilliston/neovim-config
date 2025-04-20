@@ -45,12 +45,12 @@
 -- The key bindings merit a note. The default configuration on the web page
 -- binds the enter key to the `select_or_fill_commandline` function, but I'm
 -- not even sure what that does. The one thing I know for sure is that it
--- does *NOT* execute the command. The `select_or_execute` function does, 
+-- does *NOT* execute the command. The `select_or_execute` function does,
 -- which is why I've bound it to the enter key.
 --
--- It's also worth noting that the code above helped me debug this, and I 
+-- It's also worth noting that the code above helped me debug this, and I
 -- rebound what was <A-CR> because the Windows Terminal application will
--- simply swallow that key altogether. <C-C> works more reliably. Though it
+-- simply swallow that key altogether. <C-y> works more reliably. Though it
 -- should also be noted that it copies the command text to register 0, not
 -- the system clipboard for some reason.
 
@@ -66,12 +66,12 @@ return {
         "nvim-lua/plenary.nvim",
     },
     keys = {
-        { "<leader>??", "<cmd>Cheatsheet<cr>", desc = "Cheat sheet" }
+        { "<leader>??", "<cmd>Cheatsheet<cr>", desc = "Cheat sheet" },
     },
-    opts = function ()
+    opts = function()
         require("telescope").load_extension("cheatsheet")
         local ctactions = require("cheatsheet.telescope.actions")
-        
+
         return {
             bundled_cheatsheets = true,
             bundled_plugin_cheatsheets = true,

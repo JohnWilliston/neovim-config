@@ -45,7 +45,7 @@ return {
 
             -- Ties scope plugin into the process. I didn't find it worked
             -- reliably, however, so I'm not sure it's worth it. Still, using
-            -- code here worked better than the auto-session configuration I 
+            -- code here worked better than the auto-session configuration I
             -- tried in the scope plugin spec. Go figure.
             pre_save_cmds = {
                 "ScopeSaveState",

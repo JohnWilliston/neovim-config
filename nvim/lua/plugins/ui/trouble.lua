@@ -3,7 +3,7 @@
 -- other stuff like that, when in reality it's just a tool to show you popup
 -- and other windows with lists of things. And then I didn't at all grasp from
 -- reading the main page (or docs) that while the plugin has a fairly small and
--- well defined number of built-in "modes", from which you can "inherit" to 
+-- well defined number of built-in "modes", from which you can "inherit" to
 -- define as many of your own customizations as you want.
 --
 -- For example, the built-in sources include diagnostics, fzf, a whole bunch of
@@ -21,15 +21,19 @@ return {
     keys = {
 
         { "<leader>cd", "<cmd>Trouble diagnostics toggle filter.buf=0<CR>", desc = "Buffer Diagnostics (Trouble)" },
-        { "<leader>cD", "<cmd>Trouble diagnostics toggle<CR>", desc = "Diagnostics (Trouble)" },
-        { "<leader>cf", "<cmd>Trouble qflist toggle<CR>", desc = "Quickfix List (Trouble)" },
-        { "<leader>cg", "<cmd>Trouble loclist toggle<CR>", desc = "Location List (Trouble)" },
-        { "<leader>cl", "<cmd>Trouble lsp toggle focus=false<CR>", desc = "LSP Definitions / references / ... (Trouble)" },
-        { "<leader>cs", "<cmd>Trouble symbols toggle focus=false<CR>", desc = "Symbols (Trouble)" },
-        { "<leader>ctl", "<cmd>Trouble telescope toggle<CR>", desc = "Telescope list sent to trouble" },
-        { "<leader>ctf", "<cmd>Trouble telescope_files toggle<CR>", desc = "Telescope files sent to trouble" },
+        { "<leader>cD", "<cmd>Trouble diagnostics toggle<CR>",              desc = "Diagnostics (Trouble)" },
+        { "<leader>cf", "<cmd>Trouble qflist toggle<CR>",                   desc = "Quickfix List (Trouble)" },
+        { "<leader>cg", "<cmd>Trouble loclist toggle<CR>",                  desc = "Location List (Trouble)" },
+        {
+            "<leader>cl",
+            "<cmd>Trouble lsp toggle focus=false<CR>",
+            desc = "LSP Definitions / references / ... (Trouble)",
+        },
+        { "<leader>cs",  "<cmd>Trouble symbols toggle focus=false<CR>", desc = "Symbols (Trouble)" },
+        { "<leader>ctl", "<cmd>Trouble telescope toggle<CR>",           desc = "Telescope list sent to trouble" },
+        { "<leader>ctf", "<cmd>Trouble telescope_files toggle<CR>",     desc = "Telescope files sent to trouble" },
         -- My custom function to close all the open trouble views.
-        { "<leader>cq", require("utils.config-utils").troubleclose, desc = "Close all Trouble views" },
+        { "<leader>cq",  require("utils.config-utils").troubleclose,    desc = "Close all Trouble views" },
     },
     opts = {
         modes = {
@@ -83,12 +87,12 @@ return {
                 },
                 win = { size = 0.25 },
             },
-            -- This on the other hand is a completely new mode I'm adding 
-            -- purely for sake of testing. The fact that it has a mode 
-            -- property tells the plugin from what other mode to inherit 
-            -- settings. So whereas the diagnostics mode's normal preview 
-            -- is split on the right, this mode will have a centered 
-            -- floating popup preview window. I will leave this here solely 
+            -- This on the other hand is a completely new mode I'm adding
+            -- purely for sake of testing. The fact that it has a mode
+            -- property tells the plugin from what other mode to inherit
+            -- settings. So whereas the diagnostics mode's normal preview
+            -- is split on the right, this mode will have a centered
+            -- floating popup preview window. I will leave this here solely
             -- for future example.
             test = {
                 mode = "diagnostics",
@@ -105,5 +109,5 @@ return {
                 win = { size = 0.50 },
             },
         },
-    }
+    },
 }

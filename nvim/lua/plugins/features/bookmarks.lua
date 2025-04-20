@@ -1,11 +1,11 @@
--- This plugin works great on Linux or macOS but requires a bit of custom setup 
+-- This plugin works great on Linux or macOS but requires a bit of custom setup
 -- on Windows, the most shite OS ever. In particular, you need to install the
 -- SQLite3 precompiled DLL separately and then point a Vim global variable to
 -- said DLL for it to work. See the code in the `init` method for details.
 --
 -- The following are the default keys defined when using the tree view, which
 -- are here: https://github.com/LintaoAmons/bookmarks.nvim?tab=readme-ov-file#treeview
--- 
+--
 -- default keybindings in the treeview buffer
 -- keymap = {
 --   quit = { "q", "<ESC>" },      -- Close the tree view window and return to previous window
@@ -34,31 +34,31 @@ return {
     -- backup your bookmark sqlite db when there are breaking changes
     -- tag = "v2.3.0",
     dependencies = {
-        {"kkharji/sqlite.lua"},
-        {"nvim-telescope/telescope.nvim"},
-        {"stevearc/dressing.nvim"} -- optional: better UI
+        { "kkharji/sqlite.lua" },
+        { "nvim-telescope/telescope.nvim" },
+        { "stevearc/dressing.nvim" }, -- optional: better UI
     },
     cmd = {
-      "BookmarksInfo",
-      "BookmarksGoto",
-      "BookmarksGotoPrevInList",
-      "BookmarksGotoNextInList",
-      "BookmarksMark",
-      "BookmarksTree",
+        "BookmarksInfo",
+        "BookmarksGoto",
+        "BookmarksGotoPrevInList",
+        "BookmarksGotoNextInList",
+        "BookmarksMark",
+        "BookmarksTree",
     },
     keys = {
-        { "<leader>ma", "<cmd>BookmarksMark<cr>", desc = "Bookmark toggle" },
-        { "<leader>mt", "<cmd>BookmarksTree<cr>", desc = "Bookmarks tree" },
-        { "<leader>mm", "<cmd>BookmarksGoto<cr>", desc = "Bookmarks open" },
+        { "<leader>ma", "<cmd>BookmarksMark<cr>",           desc = "Bookmark toggle" },
+        { "<leader>mt", "<cmd>BookmarksTree<cr>",           desc = "Bookmarks tree" },
+        { "<leader>mm", "<cmd>BookmarksGoto<cr>",           desc = "Bookmarks open" },
         { "<leader>mp", "<cmd>BookmarksGotoNextInList<cr>", desc = "Bookmarks go to previous" },
         { "<leader>mn", "<cmd>BookmarksGotoPrevInList<cr>", desc = "Bookmarks go to next" },
-        { "<leader>sm", "<cmd>BookmarksGoto<cr>", desc = "Search bookmarks" },
+        { "<leader>sm", "<cmd>BookmarksGoto<cr>",           desc = "Search bookmarks" },
     },
     init = function()
         -- I have to point this thing to the SQLite3 DLL manually on Windows.
         -- Downloads here: https://www.sqlite.org/download.html
         -- Choose the "Precompiled Binaries for Windows" option.
-        if (vim.loop.os_uname().sysname == "Windows_NT") then
+        if vim.loop.os_uname().sysname == "Windows_NT" then
             vim.g.sqlite_clib_path = vim.fs.normalize("~/sqlite3.dll")
         end
     end,
@@ -77,4 +77,3 @@ return {
         },
     },
 }
-

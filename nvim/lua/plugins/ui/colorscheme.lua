@@ -7,9 +7,9 @@ return {
         opts = {
             style = "night",
             styles = {
-                functions = {}
+                functions = {},
             },
-            on_colors = function (colors)
+            on_colors = function(colors)
                 -- I prefer a less bright background color.
                 colors.bg = "#0a0b16"
                 -- The following is necessary to make the code symbols in the
@@ -19,7 +19,7 @@ return {
                 -- Change the markdown heading colors a bit.
                 --colors.RenderMarkdownH1.bg = "#7fbb07"
             end,
-            on_highlights = function (highlights, colors)
+            on_highlights = function(highlights, colors)
                 -- The following is necessary to provide colors in the TabLine
                 -- (when it shows) that aren't invisible. Changing the status
                 -- line color above caused the issue in the first place.
@@ -35,15 +35,16 @@ return {
                 highlights.DiffDelete["fg"] = "#cc0000"
             end,
         },
-        config = function (_, opts)
+        config = function(_, opts)
             local tokyonight = require("tokyonight")
             tokyonight.setup(opts)
             vim.cmd([[colorscheme tokyonight]])
             -- vim.cmd([[colorscheme kanagawa]])
-        end
+        end,
     },
     -- Other color schemes I like to use from time to time.
-    { "rebelot/kanagawa.nvim", enabled = true, lazy = false, priority = 50, opts = {} },
-    { "Mofiqul/vscode.nvim",   enabled = true, lazy = false, priority = 50, opts = {} },
-    { "navarasu/onedark.nvim", enabled = true, lazy = false, priority = 50, opts = {} },
+    { "rebelot/kanagawa.nvim",     enabled = true, lazy = false, priority = 50, opts = {} },
+    -- { "Mofiqul/vscode.nvim",   enabled = true, lazy = false, priority = 50, opts = {} },
+    { "askfiy/visual_studio_code", enabled = true, lazy = false, priority = 50, opts = {} },
+    { "navarasu/onedark.nvim",     enabled = true, lazy = false, priority = 50, opts = {} },
 }

@@ -5,10 +5,10 @@ return {
     enabled = true,
     cmd = "Neotree",
     keys = {
-        { "<leader>ft.", "<cmd>Neotree last reveal toggle left<CR>", desc = "Neotree last" },
-        { "<leader>ftt", "<cmd>Neotree filesystem reveal toggle left<CR>", desc = "Neotree toggle" },
-        { "<leader>ftf", "<cmd>Neotree filesystem reveal toggle float<CR>", desc = "Neotree float" },
-        { "<leader>ftb", "<cmd>Neotree position=top buffers toggle<CR>", desc = "Neotree buffers" },
+        { "<leader>ft.", "<cmd>Neotree last reveal toggle left<CR>",          desc = "Neotree last" },
+        { "<leader>ftt", "<cmd>Neotree filesystem reveal toggle left<CR>",    desc = "Neotree toggle" },
+        { "<leader>ftf", "<cmd>Neotree filesystem reveal toggle float<CR>",   desc = "Neotree float" },
+        { "<leader>ftb", "<cmd>Neotree position=top buffers toggle<CR>",      desc = "Neotree buffers" },
         { "<leader>ftg", "<cmd>Neotree position=right git_status toggle<CR>", desc = "Neotree Git status" },
     },
     dependencies = {
@@ -21,24 +21,32 @@ return {
         local defaults = require("config.defaults")
         local configutils = require("utils.config-utils")
 
-        vim.fn.sign_define("DiagnosticSignError",
-            { text = defaults.icons.diagnostics.Error, texthl = "DiagnosticSignError" })
-        vim.fn.sign_define("DiagnosticSignWarn",
-            { text = defaults.icons.diagnostics.Warn, texthl = "DiagnosticSignWarn" })
-        vim.fn.sign_define("DiagnosticSignInfo",
-            { text = defaults.icons.diagnostics.Info, texthl = "DiagnosticSignInfo" })
-        vim.fn.sign_define("DiagnosticSignHint",
-            { text = defaults.icons.diagnostics.Hint, texthl = "DiagnosticSignHint" })
+        vim.fn.sign_define(
+            "DiagnosticSignError",
+            { text = defaults.icons.diagnostics.Error, texthl = "DiagnosticSignError" }
+        )
+        vim.fn.sign_define(
+            "DiagnosticSignWarn",
+            { text = defaults.icons.diagnostics.Warn, texthl = "DiagnosticSignWarn" }
+        )
+        vim.fn.sign_define(
+            "DiagnosticSignInfo",
+            { text = defaults.icons.diagnostics.Info, texthl = "DiagnosticSignInfo" }
+        )
+        vim.fn.sign_define(
+            "DiagnosticSignHint",
+            { text = defaults.icons.diagnostics.Hint, texthl = "DiagnosticSignHint" }
+        )
 
         return {
-            close_if_last_window = false, -- Close Neo-tree if it is the last window left in the tab
+            close_if_last_window = false,                                                   -- Close Neo-tree if it is the last window left in the tab
             open_files_in_last_window = true,
             open_files_do_not_replace_types = { "terminal", "toggleterm", "Trouble", "qf", "edgy" }, -- when opening files, do not use windows containing these filetypes or buftypes
             popup_border_style = "rounded",
             enable_git_status = true,
             enable_diagnostics = true,
-            sort_case_insensitive = false,                                 -- used when sorting files and directories in the tree
-            sort_function = nil,                                           -- use a custom function for sorting files and directories in the tree
+            sort_case_insensitive = false, -- used when sorting files and directories in the tree
+            sort_function = nil,  -- use a custom function for sorting files and directories in the tree
             -- sort_function = function (a,b)
             --       if a.type == b.type then
             --           return a.path > b.path
@@ -48,7 +56,7 @@ return {
             -- end , -- this sorts files and directories descendantly
             default_component_configs = {
                 container = {
-                    enable_character_fade = true
+                    enable_character_fade = true,
                 },
                 indent = {
                     indent_size = 2,
@@ -82,7 +90,7 @@ return {
                     -- The next two settings are only a fallback, if you use nvim-web-devicons and configure default icons there
                     -- then these will never be used.
                     default = "*",
-                    highlight = "NeoTreeFileIcon"
+                    highlight = "NeoTreeFileIcon",
                 },
                 modified = {
                     symbol = "[+]",
@@ -96,17 +104,17 @@ return {
                 git_status = {
                     symbols = {
                         -- Change type
-                        added     = "", -- or "✚", but this is redundant info if you use git_status_colors on the name
-                        modified  = "", -- or "", but this is redundant info if you use git_status_colors on the name
-                        deleted   = "✖", -- this can only be used in the git_status source
-                        renamed   = "󰁕", -- this can only be used in the git_status source
+                        added = "", -- or "✚", but this is redundant info if you use git_status_colors on the name
+                        modified = "", -- or "", but this is redundant info if you use git_status_colors on the name
+                        deleted = "✖", -- this can only be used in the git_status source
+                        renamed = "󰁕", -- this can only be used in the git_status source
                         -- Status type
                         untracked = "",
-                        ignored   = "",
-                        unstaged  = "󰄱",
-                        staged    = "",
-                        conflict  = "",
-                    }
+                        ignored = "",
+                        unstaged = "󰄱",
+                        staged = "",
+                        conflict = "",
+                    },
                 },
                 -- If you don't want to use these columns, you can set `enabled = false` for each of them individually
                 file_size = {
@@ -179,8 +187,8 @@ return {
                         -- this command supports BASH style brace expansion ("x{a,b,c}" -> xa,xb,xc). see `:h neo-tree-file-actions` for details
                         -- some commands may take optional config options, see `:h neo-tree-mappings` for details
                         config = {
-                            show_path = "none" -- "none", "relative", "absolute"
-                        }
+                            show_path = "none", -- "none", "relative", "absolute"
+                        },
                     },
                     ["A"] = "add_directory", -- also accepts the optional config.show_path option like "add". this also supports BASH style brace expansion.
                     ["d"] = "delete",
@@ -202,7 +210,7 @@ return {
                     ["<"] = "prev_source",
                     [">"] = "next_source",
                     ["i"] = "show_file_details",
-                }
+                },
             },
             nesting_rules = {},
             filesystem = {
@@ -233,11 +241,11 @@ return {
                     },
                 },
                 follow_current_file = {
-                    enabled = false,                -- This will find and focus the file in the active buffer every time
+                    enabled = false,        -- This will find and focus the file in the active buffer every time
                     --               -- the current file is changed while the tree is open.
-                    leave_dirs_open = false,        -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
+                    leave_dirs_open = false, -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
                 },
-                group_empty_dirs = false,           -- when true, empty folders will be grouped together
+                group_empty_dirs = false,   -- when true, empty folders will be grouped together
                 hijack_netrw_behavior = "open_default", -- netrw disabled, opening a directory opens neo-tree
                 -- in whatever position is specified in window.position
                 -- "open_current",  -- netrw disabled, opening a directory opens within the
@@ -282,19 +290,21 @@ return {
                 -- https://github.com/nvim-neo-tree/neo-tree.nvim/issues/202#issuecomment-1428278234
                 commands = {
                     -- over write default 'delete' command to 'trash'.
-                    delete = function (state)
+                    delete = function(state)
                         local inputs = require("neo-tree.ui.inputs")
                         local path = state.tree:get_node().path
                         local msg = "Are you sure you want to trash " .. path
                         inputs.confirm(msg, function(confirmed)
-                            if not confirmed then return end
+                            if not confirmed then
+                                return
+                            end
                             configutils.delete_to_trash(vim.fn.fnameescape(path))
                             require("neo-tree.sources.manager").refresh(state.name)
                         end)
                     end,
 
                     -- over write default 'delete_visual' command to 'trash' x n.
-                    delete_visual = function (state, selected_nodes)
+                    delete_visual = function(state, selected_nodes)
                         local inputs = require("neo-tree.ui.inputs")
                         -- get table items count
                         function GetTableLen(tbl)
@@ -304,10 +314,13 @@ return {
                             end
                             return len
                         end
+
                         local count = GetTableLen(selected_nodes)
                         local msg = "Are you sure you want to trash " .. count .. " files ?"
                         inputs.confirm(msg, function(confirmed)
-                            if not confirmed then return end
+                            if not confirmed then
+                                return
+                            end
                             for _, node in ipairs(selected_nodes) do
                                 configutils.delete_to_trash(vim.fn.fnameescape(node.path))
                             end
@@ -318,7 +331,7 @@ return {
             },
             buffers = {
                 follow_current_file = {
-                    enabled = true,      -- This will find and focus the file in the active buffer every time
+                    enabled = true, -- This will find and focus the file in the active buffer every time
                     --              -- the current file is changed while the tree is open.
                     leave_dirs_open = false, -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
                 },
@@ -337,30 +350,30 @@ return {
                         ["on"] = { "order_by_name", nowait = false },
                         ["os"] = { "order_by_size", nowait = false },
                         ["ot"] = { "order_by_type", nowait = false },
-                    }
+                    },
                 },
             },
             git_status = {
                 window = {
                     position = "float",
                     mappings = {
-                        ["A"]  = "git_add_all",
+                        ["A"] = "git_add_all",
                         ["gu"] = "git_unstage_file",
                         ["ga"] = "git_add_file",
                         ["gr"] = "git_revert_file",
                         ["gc"] = "git_commit",
                         ["gp"] = "git_push",
                         ["gg"] = "git_commit_and_push",
-                        ["o"]  = { "show_help", nowait = false, config = { title = "Order by", prefix_key = "o" } },
+                        ["o"] = { "show_help", nowait = false, config = { title = "Order by", prefix_key = "o" } },
                         ["oc"] = { "order_by_created", nowait = false },
                         ["od"] = { "order_by_diagnostics", nowait = false },
                         ["om"] = { "order_by_modified", nowait = false },
                         ["on"] = { "order_by_name", nowait = false },
                         ["os"] = { "order_by_size", nowait = false },
                         ["ot"] = { "order_by_type", nowait = false },
-                    }
-                }
-            }
+                    },
+                },
+            },
         }
     end,
 }

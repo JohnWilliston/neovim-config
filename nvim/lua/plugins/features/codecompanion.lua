@@ -1,10 +1,9 @@
-
--- I have Ollama installed locally on the MacBook Pro, so I switch the url.
+-- I have Ollama installed locally on my MacBook Pro, so I switch the url.
 local ollamaUrl = "http://ancalagon:11434"
 local ollamaModel = "granite3.1-dense"
 --local ollamaModel = "deepseek-coder-v2-fixed"
 
-if (vim.loop.os_uname().sysname == "Darwin") then
+if vim.loop.os_uname().sysname == "Darwin" then
     ollamaUrl = "http://localhost:11434"
     --ollamaModel = "deepseek-coder-v2"
 end
@@ -18,18 +17,20 @@ return {
     keys = {
         --{ "<C-a>", "<cmd>CodeCompanionActions<CR>", desc = "AI actions", mode = { "n", "v" } },
         { "<leader>aia", "<cmd>CodeCompanionActions<CR>", desc = "AI actions", mode = { "n", "v" } },
-        { "<leader>aic", "<cmd>CodeCompanionChat<CR>", desc = "AI actions", mode = { "n", "v" } },
+        { "<leader>aic", "<cmd>CodeCompanionChat<CR>",    desc = "AI actions", mode = { "n", "v" } },
     },
     cmd = {
-        "CodeCompanion", "CodeCompanionChat", "CodeCompanionActions",
+        "CodeCompanion",
+        "CodeCompanionChat",
+        "CodeCompanionActions",
     },
-    init = function ()
+    init = function()
         -- Define 'cc' as a command-line abbreviation for 'CodeCompanion'.
         vim.cmd([[cab cc CodeCompanion]])
     end,
     opts = {
         -- This option is unfortunately global, but it's the only way I could
-        -- get the boilerplate example prompt to generate without swtiching
+        -- get the boilerplate example prompt to generate without switching
         -- Neovim into diff mode.
         display = {
             diff = {
@@ -66,6 +67,7 @@ return {
                 adapter = "ollama",
             },
         },
+        -- TODO: Add some more (and better) examples of use.
         prompt_library = {
             ["Boilerplate HTML"] = {
                 strategy = "inline",
@@ -79,7 +81,7 @@ return {
                         vim.api.nvim_set_current_buf(bufnr)
                         -- I think you can technically just pass  an empty table, but not sure.
                         local buf = vim.api.nvim_get_current_buf()
-                        vim.api.nvim_set_option_value("filetype", "html", { buf = buf } )
+                        vim.api.nvim_set_option_value("filetype", "html", { buf = buf })
                         return bufnr
                     end,
                     placement = "add", -- Without this, it always creates a new buffer.
@@ -87,7 +89,8 @@ return {
                 prompts = {
                     {
                         role = "system",
-                        content = "You are an expert HTML programmer. Output only plain text format. Do not include any markdown. Do not include any explanation. Just produce raw HTML 5 code.",
+                        content =
+                        "You are an expert HTML programmer. Output only plain text format. Do not include any markdown. Do not include any explanation. Just produce raw HTML 5 code.",
                     },
                     {
                         role = "user",
@@ -120,18 +123,22 @@ return {
                     {
                         role = "user",
                         content = function(context)
-                            local text = require("codecompanion.helpers.actions").get_code(context.start_line, context.end_line)
-                            local query = "I have the following code:\n\n```" .. context.filetype .. "\n" .. text .. "\n```\n\n"
+                            local text =
+                                require("codecompanion.helpers.actions").get_code(context.start_line, context.end_line)
+                            local query = "I have the following code:\n\n```"
+                                .. context.filetype
+                                .. "\n"
+                                .. text
+                                .. "\n```\n\n"
                             --vim.print(query)
                             return query
                         end,
                         opts = {
                             contains_code = true,
-                        }
+                        },
                     },
                 },
             },
         },
     },
 }
-

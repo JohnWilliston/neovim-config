@@ -4,7 +4,13 @@ return {
     "folke/persistence.nvim",
     event = "BufReadPre", -- this will only start session saving when an actual file was opened
     keys = {
-        { "<leader>p.", function () require("persistence").load({ last = true }) end, desc = "Project restore last session" },
+        {
+            "<leader>p.",
+            function()
+                require("persistence").load({ last = true })
+            end,
+            desc = "Project restore last session",
+        },
     },
     opts = {},
 }

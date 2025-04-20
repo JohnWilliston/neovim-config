@@ -4,9 +4,9 @@
 --  3. There are a number of other commands to insert rows and such.
 -- It's a nice plugin, but I wish it provided better/more keymaps.
 return {
-	"Myzel394/easytables.nvim",
-	cmd = { "EasyTablesCreateNew", "EasyTablesImportThisTable" },
-	ft = "markdown",
-	lazy = true,
-	config = true,
+    "Myzel394/easytables.nvim",
+    cmd = { "EasyTablesCreateNew", "EasyTablesImportThisTable" },
+    ft = "markdown",
+    lazy = true,
+    config = true,
 }

@@ -3,10 +3,10 @@ return {
     event = "VeryLazy",
     cmd = "Noice",
     keys = {
-        { "<leader>nh", "<cmd>Noice history<CR>", desc = "Notification history" },
-        { "<leader>nd", "<cmd>Noice dismiss<CR>", desc = "Dismiss notifications" },
-        { "<leader>ne", "<cmd>Noice errors<CR>", desc = "Error notifications" },
-        { "<leader>nl", "<cmd>Noice last<CR>", desc = "Last notification" },
+        { "<leader>nh", "<cmd>Noice history<CR>",   desc = "Notification history" },
+        { "<leader>nd", "<cmd>Noice dismiss<CR>",   desc = "Dismiss notifications" },
+        { "<leader>ne", "<cmd>Noice errors<CR>",    desc = "Error notifications" },
+        { "<leader>nl", "<cmd>Noice last<CR>",      desc = "Last notification" },
         { "<leader>nt", "<cmd>Noice telescope<CR>", desc = "Notifications in telescope" },
     },
     dependencies = {
@@ -17,10 +17,10 @@ return {
         --   If not available, we use `mini` as the fallback
         "rcarriga/nvim-notify",
     },
-    init = function ()
-       -- I'm adding a custom Vim global largely so lualine can know whether to
-       -- make certain changes to accomodate noice.
-       vim.g.noice = true
+    init = function()
+        -- I'm adding a custom Vim global largely so lualine can know whether to
+        -- make certain changes to accommodate noice.
+        vim.g.noice = true
     end,
     opts = {
         cmdline = {
@@ -40,7 +40,7 @@ return {
             bottom_search = false, -- use a classic bottom cmdline for search
             command_palette = true, -- position the cmdline and popupmenu together
             long_message_to_split = true, -- long messages will be sent to a split
-            inc_rename = false, -- enables an input dialog for inc-rename.nvim
+            inc_rename = false,  -- enables an input dialog for inc-rename.nvim
             lsp_doc_border = false, -- add a border to hover docs and signature help
         },
         routes = {

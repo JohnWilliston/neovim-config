@@ -16,17 +16,77 @@ return {
             { "LiadOz/nvim-dap-repl-highlights",  opts = {} },
         },
         keys = {
-            { "<leader>db", function () require("dap").toggle_breakpoint() end, desc = "Debug toggle breakpoint" },
-            { "<leader>dg", function () require("dap").continue() end, desc = "Debug continue" },
-            { "<leader>di", function () require("dap").step_into() end, desc = "Debug step into" },
-            { "<leader>dv", function () require("dap").step_over() end, desc = "Debug step over" },
-            { "<leader>du", function () require("dap").step_out() end, desc = "Debug step out" },
+            {
+                "<leader>db",
+                function()
+                    require("dap").toggle_breakpoint()
+                end,
+                desc = "Debug toggle breakpoint",
+            },
+            {
+                "<leader>dg",
+                function()
+                    require("dap").continue()
+                end,
+                desc = "Debug continue",
+            },
+            {
+                "<leader>di",
+                function()
+                    require("dap").step_into()
+                end,
+                desc = "Debug step into",
+            },
+            {
+                "<leader>dv",
+                function()
+                    require("dap").step_over()
+                end,
+                desc = "Debug step over",
+            },
+            {
+                "<leader>du",
+                function()
+                    require("dap").step_out()
+                end,
+                desc = "Debug step out",
+            },
             -- Add key bindings to emulate Visual Studio 2022 as well for my sanity.
-            { "<F9>", function () require("dap").toggle_breakpoint() end, desc = "Debug toggle breakpoint" },
-            { "<F5>", function () require("dap").continue() end, desc = "Debug continue" },
-            { "<F11>", function () require("dap").step_into() end, desc = "Debug step into" },
-            { "<F10>", function () require("dap").step_over() end, desc = "Debug step over" },
-            { "<S-F11>", function () require("dap").step_out() end, desc = "Debug step out" },
+            {
+                "<F9>",
+                function()
+                    require("dap").toggle_breakpoint()
+                end,
+                desc = "Debug toggle breakpoint",
+            },
+            {
+                "<F5>",
+                function()
+                    require("dap").continue()
+                end,
+                desc = "Debug continue",
+            },
+            {
+                "<F11>",
+                function()
+                    require("dap").step_into()
+                end,
+                desc = "Debug step into",
+            },
+            {
+                "<F10>",
+                function()
+                    require("dap").step_over()
+                end,
+                desc = "Debug step over",
+            },
+            {
+                "<S-F11>",
+                function()
+                    require("dap").step_out()
+                end,
+                desc = "Debug step out",
+            },
         },
         init = function()
             -- I ditched all the stuff I had previously written in favor of the
@@ -121,9 +181,27 @@ return {
     {
         "rcarriga/nvim-dap-ui",
         keys = {
-            { "<leader>do", function () require("dapui").open() end, desc = "Debug open UI" },
-            { "<leader>dc", function () require("dapui").close() end, desc = "Debug close UI" },
-            { "<leader>dt", function () require("dapui").toggle() end, desc = "Debug toggle UI" },
+            {
+                "<leader>do",
+                function()
+                    require("dapui").open()
+                end,
+                desc = "Debug open UI",
+            },
+            {
+                "<leader>dc",
+                function()
+                    require("dapui").close()
+                end,
+                desc = "Debug close UI",
+            },
+            {
+                "<leader>dt",
+                function()
+                    require("dapui").toggle()
+                end,
+                desc = "Debug toggle UI",
+            },
         },
         dependencies = {
             "mfussenegger/nvim-dap",
@@ -168,7 +246,13 @@ return {
     {
         "jbyuki/one-small-step-for-vimkind",
         keys = {
-            { "<leader>dl", function () require("osv").launch({port = 8086}) end, desc = "Debug Lua in Neovim" },
+            {
+                "<leader>dl",
+                function()
+                    require("osv").launch({ port = 8086 })
+                end,
+                desc = "Debug Lua in Neovim",
+            },
         },
         -- config = function()
         --     local dap = require("dap")
@@ -236,5 +320,4 @@ return {
     --     },
     -- }
     -- { "folke/neodev.nvim", enabled = false }, -- make sure to uninstall or disable neodev.nvim
-
 }

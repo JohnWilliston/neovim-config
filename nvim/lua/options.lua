@@ -66,7 +66,7 @@ vim.g.have_nerd_font = true
 
 -- Option customizations for running Neovide.
 if vim.g.neovide then
-    local fontName = "0xProto Nerd Font:h12"
+    local fontName = "0xProto Nerd Font:h13"
     -- We boost the size on macOS, presumably due to the higher DPI or something.
     if vim.loop.os_uname().sysname == "Darwin" then
         fontName =  "0xProto Nerd Font:h16"

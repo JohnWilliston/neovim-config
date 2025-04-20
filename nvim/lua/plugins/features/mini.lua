@@ -1,9 +1,16 @@
 return {
-	"echasnovski/mini.nvim",
+    "echasnovski/mini.nvim",
     keys = {
-        { "<leader>ec", function () require("mini.colors").interactive() end, desc = "Mini colors", mode = "n" },
+        {
+            "<leader>ec",
+            function()
+                require("mini.colors").interactive()
+            end,
+            desc = "Mini colors",
+            mode = "n",
+        },
     },
-	config = function()
+    config = function()
         -- I'm using Snacks animation for now, so this is disabled.
         -- local animate = require("mini.animate")
         -- -- Only enable animation if we're not using Neovide.
@@ -21,22 +28,22 @@ return {
 
         require("mini.align").setup()
 
-		-- Lets me dump current colors to a file and such. Helpful utility.
-		require("mini.colors").setup()
+        -- Lets me dump current colors to a file and such. Helpful utility.
+        require("mini.colors").setup()
 
-		require("mini.cursorword").setup()
-		-- I like the current word underlined.
-		vim.api.nvim_set_hl(0, "MiniCursorwordCurrent", { underline = true })
-		--vim.cmd([[hi MiniCursorwordCurrent gui=underline]])
+        require("mini.cursorword").setup()
+        -- I like the current word underlined.
+        vim.api.nvim_set_hl(0, "MiniCursorwordCurrent", { underline = true })
+        --vim.cmd([[hi MiniCursorwordCurrent gui=underline]])
 
-		--require("mini.indentscope").setup()
+        --require("mini.indentscope").setup()
 
         require("mini.move").setup()
         require("mini.pairs").setup()
 
-		--require("mini.tabline").setup()
+        --require("mini.tabline").setup()
 
-		--require("mini.icons").setup()
-		--require('mini.diff').setup()  -- Can't figure out how to use this.
-	end,
+        --require("mini.icons").setup()
+        --require('mini.diff').setup()  -- Can't figure out how to use this.
+    end,
 }

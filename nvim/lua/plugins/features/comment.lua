@@ -1,7 +1,3 @@
-
--- I largely copied and pasted from Alex G.'s version of the setup:
--- https://github.com/Alex-Gilbert/dotfiles/blob/main/.config/nvim/lua/alexg/plugins/comment.lua
-
 return {
     "numToStr/Comment.nvim",
     opts = {
@@ -49,4 +45,3 @@ return {
     },
     lazy = false,
 }
-

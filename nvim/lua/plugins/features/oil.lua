@@ -7,15 +7,22 @@ return {
     --commit = "254bc6635cb3f77e6e9a89155652f368e5535160",  -- The commit that broke the plugin.
     cmd = { "Oil" },
     keys = {
-        { "<leader>f`", function ()
-            
-            local configutils = require("utils.config-utils")
-            local path = configutils.get_current_file_path()
-            vim.cmd("Oil " .. path)
-        end, desc = "Oil (in current buffer path)" },
-        { "<leader>fc", function ()
-            vim.cmd("Oil " .. vim.fn.stdpath("config"))
-        end, desc = "Oil (in config path)" },
+        {
+            "<leader>f`",
+            function()
+                local configutils = require("utils.config-utils")
+                local path = configutils.get_current_file_path()
+                vim.cmd("Oil " .. path)
+            end,
+            desc = "Oil (in current buffer path)",
+        },
+        {
+            "<leader>fc",
+            function()
+                vim.cmd("Oil " .. vim.fn.stdpath("config"))
+            end,
+            desc = "Oil (in config path)",
+        },
         { "<leader>fo", "<cmd>Oil .<CR>", desc = "Oil ." },
     },
     -- -- Optional dependencies

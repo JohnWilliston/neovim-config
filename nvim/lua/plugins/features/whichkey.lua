@@ -1,5 +1,5 @@
 -- NB: The which-key plugin shows popups for marks, registers, and even
--- spelling suggestions which makes other plugins superfluous: ' or ` shows 
+-- spelling suggestions which makes other plugins superfluous: ' or ` shows
 -- marks, " shows registers (<C-r> in insert/command mode), and z= shows
 -- spelling suggestions for errors when spelling is enabled.
 --
@@ -28,19 +28,28 @@ return {
             -- other buffers/windows. By including them in the named group
             -- defined in keymaps.lua, I get the added benefit of them
             -- showing up right alongside the other keybinds. Very handy!
-            { "<leader>b", group = "Buffers", expand = function()
-                return require("which-key.extras").expand.buf()
-            end
+            {
+                "<leader>b",
+                group = "Buffers",
+                expand = function()
+                    return require("which-key.extras").expand.buf()
+                end,
             },
-            { "<leader>w", group = "Windows", expand = function()
-                return require("which-key.extras").expand.win()
-            end
+            {
+                "<leader>w",
+                group = "Windows",
+                expand = function()
+                    return require("which-key.extras").expand.win()
+                end,
             },
-            
+
             -- My custom addition for tabs
-            { "<leader>t", group = "Tools", expand = function()
-                return require("utils.config-utils").expand_tab()
-            end,
+            {
+                "<leader>t",
+                group = "Tools",
+                expand = function()
+                    return require("utils.config-utils").expand_tab()
+                end,
             },
 
             -- { "<leader>t", group = "Tabs / Tools", expand = function()

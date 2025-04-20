@@ -1,17 +1,47 @@
--- The following functions are from the awesome-neovim configuration. I was
--- amazed at the sheer number of Telescope options it seems to offer, so I
--- thought I'd crib their approach and leverage it. I also like how easy it
--- is to lazy load the plugin with all the different key combinations.
---
--- https://github.com/Ultra-Code/awesome-neovim/blob/master/lua/plugins/telescope.lua
-
---TODO: use immediately invoked function expression for vimgrep_arguments .ie
---(fn()statement end)()
---HACK: move mappings from previous configuration here
---https://github.com/nvim-telescope/telescope.nvim/blob/master/lua/telescope/builtin/__files.lua
---HELP: telescope nvim
 
 local configutils = require("utils.config-utils")
+local telescope_utils = require("utils.telescope-utils")
+
+-- Uses my own custom entry to improve buffer selection. Cribbed from:
+-- https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes#customize-buffers-display-to-look-like-leaderf
+local search_buffers = function()
+    local opts = {
+        entry_maker = telescope_utils.buffer_entry_maker(), 
+    }
+    require("telescope.builtin")["buffers"](opts)
+end
+
+local search_sibling_files = function()
+    path = configutils.get_current_file_path()
+    require("telescope.builtin")["find_files"]({cwd = path})
+end
+
+local search_yaml_symbols = function()
+    local opts = {
+        layout_config = {
+            preview_width = 0.5,
+        },
+    }
+    telescope_utils.yaml_symbols_picker(opts)
+end
+
+local search_snippets = function()
+    local theme = require("telescope.themes").get_dropdown({
+        layout_strategy = "horizontal", 
+        layout_config = {
+            horizontal = { height = 0.5, width = 0.5 },
+            preview_width = 0.5,
+            prompt_position = "top", 
+        },
+    })
+    require("telescope").extensions.luasnip.luasnip(theme)
+end
+
+-- The following are originally from the awesome-neovim configuration. I was
+-- amazed at the sheer number of Telescope options it offered, so I
+-- thought I'd crib their approach and expand it. See:
+--
+-- https://github.com/Ultra-Code/awesome-neovim/blob/master/lua/plugins/telescope.lua
 
 -- this will return a function that calls telescope.
 -- cwd will default to lazyvim.util.get_root
@@ -30,7 +60,6 @@ local telescope_builtin = function(builtin, opts)
                 builtin = "find_files"
             end
             -- live_grep_from_project_git_root
-            -- TODO: test with and without the `get_git_root`
         elseif builtin == "live_grep" then
             if configutils.is_git_repo() then
                 opts.cwd = configutils.get_git_root()
@@ -50,33 +79,98 @@ end
 -- Found this in a GitHub issue and am happy to say it works:
 -- https://github.com/nvim-telescope/telescope.nvim/issues/1048#issuecomment-1991532321
 local function select_one_or_multiple(prompt_bufnr)
-    local picker = require('telescope.actions.state').get_current_picker(prompt_bufnr)
+    local picker = require("telescope.actions.state").get_current_picker(prompt_bufnr)
     local multi = picker:get_multi_selection()
     if not vim.tbl_isempty(multi) then
-        require('telescope.actions').close(prompt_bufnr)
+        require("telescope.actions").close(prompt_bufnr)
         for _, j in pairs(multi) do
             if j.path ~= nil then
-                vim.cmd(string.format('%s %s', 'edit', j.path))
+                vim.cmd(string.format("%s %s", "edit", j.path))
             end
         end
     else
-        require('telescope.actions').select_default(prompt_bufnr)
+        require("telescope.actions").select_default(prompt_bufnr)
     end
 end
 
 return {
     "nvim-telescope/telescope.nvim",
     dependencies = {
-        "nvim-telescope/telescope-ui-select.nvim",
-        "nvim-lua/plenary.nvim",
-        "nvim-tree/nvim-web-devicons",
-        "nvim-telescope/telescope-fzf-native.nvim",
-        "nvim-telescope/telescope-live-grep-args.nvim",
+        -- Normal telescope dependencies.
+        { "nvim-lua/plenary.nvim" },
+        { "nvim-tree/nvim-web-devicons" },
+        -- All the various add-ins I've enabled. See all the load-extension
+        -- calls down below in the config method.
+        { "nvim-telescope/telescope-ui-select.nvim" },
+        { 
+            "nvim-telescope/telescope-fzf-native.nvim",
+            build = "make" -- Works on Linux/macOS, fails on Windows
+        },
+        { "nvim-telescope/telescope-live-grep-args.nvim" },
+        -- { "TC72/telescope-tele-tabby.nvim" },
+        { "LukasPietzschmann/telescope-tabs" },
+        { "xiyaowong/telescope-emoji.nvim" },
+        { "ghassan0/telescope-glyph.nvim" },
+        { "ANGkeith/telescope-terraform-doc.nvim" },
+        { "debugloop/telescope-undo.nvim" },
+        { "benfowler/telescope-luasnip.nvim" },
+        { "tsakirist/telescope-lazy.nvim" },
+        { "polirritmico/telescope-lazy-plugins.nvim" },
+        {
+            'prochri/telescope-all-recent.nvim',
+            dependencies = {
+                "nvim-telescope/telescope.nvim",
+                "kkharji/sqlite.lua",
+                -- optional, if using telescope for vim.ui.select
+                "stevearc/dressing.nvim"
+            },
+            opts =
+                {
+                    -- your config goes here
+                }
+        },
+        -- A helpful picker plugin to use for opening in a chosen window.
+        { 
+            "s1n7ax/nvim-window-picker",
+            opts = {
+
+                selection_chars = "123456789ABCDEF",
+                show_prompt = false,
+                highlights = {
+                    enabled = true,
+                    statusline = {
+                        focused = {
+                            fg = '#ededed',
+                            bg = '#e35e4f',
+                            bold = true,
+                        },
+                        unfocused = {
+                            fg = '#ededed',
+                            bg = '#0077cc',
+                            bold = true,
+                        },
+                    },
+                    winbar = {
+                        focused = {
+                            fg = '#ededed',
+                            bg = '#e35e4f',
+                            bold = true,
+                        },
+                        unfocused = {
+                            fg = '#ededed',
+                            bg = '#0077cc',
+                            bold = true,
+                        },
+                    },
+                },
+            },
+        },
     },
     cmd = "Telescope",
     -- List of builtins here: https://github.com/nvim-telescope/telescope.nvim?tab=readme-ov-file#pickers
     keys = {
-        { "<leader><leader>", telescope_builtin("buffers", { show_all_buffers = true }),   desc = "Switch buffer", },
+        -- { "<leader><leader>", telescope_builtin("buffers", { show_all_buffers = true }),   desc = "Switch buffer", },
+        { "<leader><leader>", search_buffers,                                              desc = "Switch buffer", },
 
         -- Git integrations, which used to throw an error if not in a Git directory (I fixed that).
         { "<leader>vb",       telescope_builtin("git_branches"),                           desc = "Git branches", },
@@ -87,7 +181,7 @@ return {
         { "<leader>vu",       telescope_builtin("git_bcommits"),                           desc = "Git buffer commits", },
         { "<leader>vU",       telescope_builtin("git_bcommits_range"),                     desc = "Git buffer commits range", },
         -- LSP navigation.
-        { "<leader>li",       telescope_builtin("lsp_implenentations"),                    desc = "Search LSP implementations", },
+        { "<leader>li",       telescope_builtin("lsp_implementations"),                    desc = "Search LSP implementations", },
         { "<leader>l<",       telescope_builtin("lsp_incoming_calls"),                     desc = "Search LSP incoming calls", },
         { "<leader>l>",       telescope_builtin("lsp_outgoing_calls"),                     desc = "Search LSP outgoing calls", },
         { "<leader>ls",       telescope_builtin("lsp_document_symbols"),                   desc = "Search LSP document symbols", },
@@ -95,14 +189,18 @@ return {
         { "<leader>lr",       telescope_builtin("lsp_references"),                         desc = "Search LSP references", },
         { "<leader>lw",       telescope_builtin("lsp_dynamic_workspace_symbols"),          desc = "Search LSP dynamic workspace symbols", },
         -- Other [S]earch related bindings.
+        { "<leader>s`",       search_sibling_files,                                        desc = "Search sibling files", },
         { "<leader>s.",       telescope_builtin("resume"),                                 desc = "Search . repeat", },
         { "<leader>s:",       telescope_builtin("command_history"),                        desc = "Search : command History", },
+        { "<leader>s&",       "<cmd>Telescope glyph<CR>",                                  desc = "Search font glyphs" },
+        { "<leader>s0",       "<cmd>Telescope yank_history<CR>",                           desc = "Search yank history" },
         { "<leader>sa",       telescope_builtin("autocommands"),                           desc = "Search autocommands", },
         { "<leader>sb",       telescope_builtin("current_buffer_fuzzy_find"),              desc = "Search buffer", },
         { "<leader>sc",       "<cmd>TodoTelescope<CR>",                                    desc = "Todo Comments (Telescope)" },
         { "<leader>sC",       telescope_builtin("colorscheme", { enable_preview = true }), desc = "Search colorscheme with preview", },
         { "<leader>sd",       telescope_builtin("diagnostics", { bufnr = 0 }),             desc = "Search diagnostics", },
         { "<leader>sD",       telescope_builtin("diagnostics"),                            desc = "Search all diagnostics", },
+        { "<leader>se",       "<cmd>Telescope emoji<CR>",                                  desc = "Search emoji" },
         { "<leader>sf",       telescope_builtin("files"),                                  desc = "Search files", },
         { "<leader>sF",       telescope_builtin("filetypes"),                              desc = "Search file types", },
         { "<leader>sg",       telescope_builtin("live_grep"),                              desc = "Search by grep", },
@@ -122,14 +220,22 @@ return {
         { "<leader>sP",       telescope_builtin("planets"),                                desc = "Search planets (fun!)", },
         { "<leader>sq",       telescope_builtin("quickfix"),                               desc = "Search quick fix", },
         { "<leader>sr",       telescope_builtin("registers"),                              desc = "Search registers", },
-        { "<leader>sR",       telescope_builtin("reloader"),                               desc = "Search reload modules", },
+        { "<leader>sR",       telescope_builtin("reloader"),                               desc = "Search and reload Lua modules", },
         { "<leader>ss",       telescope_builtin("spell_suggest"),                          desc = "Search spelling suggestions", },
+        -- { "<leader>sS",       "<cmd>Telescope luasnip<CR>",                                desc = "Search Luasnip snippets", },
+        { "<leader>sS",       search_snippets,                                             desc = "Search Luasnip snippets" },
         { "<leader>s/",       telescope_builtin("search_history"),                         desc = "Search search history", },
-        { "<leader>st",       telescope_builtin("tags"),                                   desc = "Search tags" },
+        -- NOTE: I just don't use tags enough for this to be helpful. As such I'm reserving to search tabs. 
+        -- { "<leader>st",       telescope_builtin("tags"),                                   desc = "Search tags" },
+        { "<leader>st",       "<cmd>Telescope telescope-tabs list_tabs<CR>",               desc = "Search tabs" },
         { "<leader>sT",       telescope_builtin("treesitter"),                             desc = "Search treesitter" },
+        { "<leader>su",       "<cmd>Telescope undo<CR>",                                   desc = "Search undo" },
         { "<leader>sw",       telescope_builtin("grep_string"),                            desc = "Search word via grep", },
+        { "<leader>sxt",      "<cmd>Telescope terraform_doc<CR>",                          desc = "Search extras - Terraform providers docs", },
+        { "<leader>sxl",      "<cmd>Telescope lazy<CR>",                                   desc = "Search extras - Lazy plugin information", },
+        { "<leader>sxL",      "<cmd>Telescope lazy_plugins<CR>",                           desc = "Search extras - Lazy plugin configuration", },
         { "<leader>sy",       telescope_builtin("symbols"),                                desc = "Search symbols", },
-        { "<leader>sz",       telescope_builtin("current_buffer_fuzzy_find"),              desc = "Search current buffer fuzzy", },
+        { "<leader>sY",       search_yaml_symbols,                                         desc = "Search YAML symbols", },
     },
     opts = function()
         local actions = require("telescope.actions")
@@ -139,16 +245,16 @@ return {
         local add_to_trouble = require("trouble.sources.telescope").add
         return {
             extensions = {
+                -- Note the unique syntax because the name has a hyphen.
                 ["ui-select"] = {
                     require("telescope.themes").get_dropdown(),
                 },
-                -- fzf = {
-                --     fuzzy = true,                    -- false will only do exact matching
-                --     override_generic_sorter = true,  -- override the generic sorter
-                --     override_file_sorter = true,     -- override the file sorter
-                --     case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
-                --     -- the default case_mode is "smart_case"
-                -- }
+                fzf = {
+                    fuzzy = true,                    -- false will only do exact matching
+                    override_generic_sorter = true,  -- override the generic sorter
+                    override_file_sorter = true,     -- override the file sorter
+                    case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
+                },
                 live_grep_args = {
 
                     auto_quoting = true, -- enable/disable auto-quoting
@@ -165,15 +271,78 @@ return {
                     -- theme = "dropdown", -- use dropdown theme
                     -- theme = { }, -- use own theme spec
                     -- layout_config = { mirror=true }, -- mirror preview pane
-                }
+                },
+                -- tele_tabby = {
+                --     use_highlighter = true,
+                -- },
+                ["telescope-tabs"] = {
+                    close_tab_shortcut_i = '<A-d>',  -- if you're in insert mode
+                    close_tab_shortcut_n = 'dd',     -- if you're in normal mode
+                    -- A minor change here to include tab number in search.
+                    entry_ordinal = function(tab_id, buffer_ids, file_names, file_paths, is_current)
+                        return string.format("%d %s", tab_id, table.concat(file_names, ' '))
+                    end,
+                },
+                -- Type information can be loaded via 'https://github.com/folke/lazydev.nvim'
+                -- by adding the below two annotations:
+                ---@module "telescope._extensions.lazy"
+                ---@type TelescopeLazy.Config
+                lazy = {
+                    -- Optional theme (the extension doesn't set a default theme)
+                    theme = "ivy",
+                    -- The below configuration options are the defaults
+                    show_icon = true,
+                    mappings = {
+                        open_in_browser = "<C-o>",
+                        open_in_file_browser = "<M-b>",
+                        open_in_find_files = "<C-f>",
+                        open_in_live_grep = "<C-g>",
+                        open_in_terminal = "<C-t>",
+                        open_plugins_picker = "<C-b>",
+                        open_lazy_root_find_files = "<C-r>f",
+                        open_lazy_root_live_grep = "<C-r>g",
+                        change_cwd_to_plugin = "<C-c>d",
+                    },
+                    actions_opts = {
+                        open_in_browser = {
+                            auto_close = false,
+                        },
+                        change_cwd_to_plugin = {
+                            auto_close = false,
+                        },
+                    },
+                    terminal_opts = {
+                        relative = "editor",
+                        style = "minimal",
+                        border = "rounded",
+                        title = "Telescope lazy",
+                        title_pos = "center",
+                        width = 0.5,
+                        height = 0.5,
+                    },
+                    -- Other telescope configuration options
+                },
+                -- It seems like the lazy plugins is a bit out of date with 
+                -- respect to telescope layout options. It uses the "flex"
+                -- layout by default and apparently support for some of these
+                -- settings has changed. So I'm overriding it to set things to 
+                -- use the horizontal layout instead.
+                lazy_plugins = {
+                    picker_opts = {
+                        sorting_strategy = "ascending",
+                        layout_strategy = "horizontal",
+                    },
+                },
             },
             defaults = {
                 layout_strategy = "horizontal",
                 layout_config = {
-                    horizontal = { height = 0.9, width = 0.9 },
+                    horizontal = { height = 0.9, width = 0.9, preview_width = 0.7 },
                     vertical = { height = 0.9, width = 0.9 },
-                    preview_width = 0.7,
                     prompt_position = "bottom", 
+                },
+                preview = {
+                    filesize_limit = 0.5, -- MB
                 },
                 prompt_prefix = " ",
                 selection_caret = " ",
@@ -196,21 +365,62 @@ return {
                         ["<C-Up>"] = actions.cycle_history_prev,
                         ["<M-Down>"] = actions.cycle_history_next,
                         ["<M-Up>"] = actions.cycle_history_prev,
-                        ["<C-d>"] = actions.delete_buffer,
+                        -- ["<C-d>"] = actions.delete_buffer,
                         ["<C-h>"] = actions.preview_scrolling_left,
                         ["<C-l>"] = actions.preview_scrolling_right,
                         ["<C-q>"] = open_with_trouble,
                         ["<A-q>"] = add_to_trouble,
+
                         ["<M-p>"] = actions_layout.toggle_preview,
                         ["<CR>"] = select_one_or_multiple,
+                        -- Clear the search field rather than scroll.
+                        -- https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes#mapping-c-u-to-clear-prompt
+                        -- ["<C-u>"] = false,
+                        ["<C-s>"] = actions.cycle_previewers_next,
+                        ["<C-a>"] = actions.cycle_previewers_prev,
+
+                        -- Helpful tool to choose a window for opening.
+                        -- https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes#using-nvim-window-picker-to-choose-a-target-window-when-opening-a-file-from-any-picker
+                        ["<C-w>"] = function(prompt_bufnr)
+                            -- Use nvim-window-picker to choose the window by dynamically attaching a function
+                            local action_set = require("telescope.actions.set")
+                            local action_state = require("telescope.actions.state")
+
+                            local picker = action_state.get_current_picker(prompt_bufnr)
+                            picker.get_selection_window = function(picker, entry)
+                                local picked_window_id = require("window-picker").pick_window() or vim.api.nvim_get_current_win()
+                                -- Unbind after using so next instance of the picker acts normally
+                                picker.get_selection_window = nil
+                                return picked_window_id
+                            end
+
+                            return action_set.edit(prompt_bufnr, "edit")
+                        end,
                     },
                     n = {
-                        ["dd"] = actions.delete_buffer,
-                        ["<C-d>"] = actions.delete_buffer,
+                        -- ["dd"] = actions.delete_buffer,
+                        -- ["<C-d>"] = actions.delete_buffer,
                         ["q"] = actions.close,
                         ["<C-[>"] = actions.close,
                         ["<C-q>"] = open_with_trouble,
                         ["<A-q>"] = add_to_trouble,
+                        ["<M-p>"] = actions_layout.toggle_preview,
+                    },
+                },
+            },
+            pickers = {
+                buffers = {
+                    layout_strategy = "vertical",
+                    layout_config = {
+                        vertical = { height = 0.9, width = 0.9 },
+                        preview_height = 0.4,
+                        prompt_position = "bottom", 
+                    },
+                    mappings = {
+                        n = {
+                            -- Allow deleting in-memory buffers in the picker.
+                            ["dd"] = actions.delete_buffer + actions.move_to_top,
+                        },
                     },
                 },
             },
@@ -219,8 +429,18 @@ return {
     config = function(_, opts)
         local telescope = require("telescope")
         telescope.setup(opts)
+        telescope.load_extension("fzf")
         telescope.load_extension("ui-select")
         telescope.load_extension("refactoring")
         telescope.load_extension("live_grep_args")
+        telescope.load_extension("telescope-tabs")
+        telescope.load_extension("emoji")
+        telescope.load_extension('glyph')
+        telescope.load_extension("yank_history")
+        telescope.load_extension("terraform_doc")
+        telescope.load_extension("undo")
+        telescope.load_extension("luasnip")
+        telescope.load_extension("lazy")
+        telescope.load_extension("lazy_plugins")
     end,
 }

@@ -8,11 +8,11 @@ return {
         "ToggleTermToggleAll",
     },
     keys = {
-        { "<leader>t\\", "<cmd>1ToggleTerm direction=float name=Popup<cr>", desc = "Terminal1 (Popup)", mode = "n" },
-        { "<leader>t-", "<cmd>2ToggleTerm direction=horizontal name=Horiztontal<cr>", desc = "Terminal2 (Horizontal)", mode = "n" },
-        { "<leader>t|", "<cmd>3ToggleTerm direction=vertical name=Vertical<cr>", desc = "Terminal3 (Vertical)", mode = "n" },
-        { "<leader>tt", "<cmd>4ToggleTerm direction=tab name=Tab<cr>", desc = "Terminal4 (Tab)", mode = "n" },
-        { "<leader>tx", "<cmd>ToggleTermSendCurrentLine 1<cr>", desc = "Send Line to Popup Terminal", mode = "n" },
+        { "<leader>t\\", "<cmd>1ToggleTerm direction=float name=Popup<cr>",            desc = "Terminal1 (Popup)" },
+        { "<leader>t-",  "<cmd>2ToggleTerm direction=horizontal name=Horiztontal<cr>", desc = "Terminal2 (Horizontal)" },
+        { "<leader>t|",  "<cmd>3ToggleTerm direction=vertical name=Vertical<cr>",      desc = "Terminal3 (Vertical)" },
+        { "<leader>tt",  "<cmd>4ToggleTerm direction=tab name=Tab<cr>",                desc = "Terminal4 (Tab)" },
+        { "<leader>tx",  "<cmd>ToggleTermSendCurrentLine 1<cr>",                       desc = "Send Line to Popup Terminal" },
     },
     opts = {
         start_in_insert = false,
