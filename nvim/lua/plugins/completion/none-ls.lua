@@ -8,7 +8,9 @@ return {
 		null_ls.setup({
 			sources = {
 				-- Actions
-				null_ls.builtins.code_actions.gitsigns,
+                -- I disabled this because it was generating a blame option
+                -- for every single line in every single file.
+				-- null_ls.builtins.code_actions.gitsigns,
 				null_ls.builtins.code_actions.refactoring,
 
 				-- Doesn't seem to exist or can't install or something.

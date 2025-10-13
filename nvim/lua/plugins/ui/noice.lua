@@ -23,11 +23,22 @@ return {
         vim.g.noice = true
     end,
     opts = {
+        -- NB: If you disable the cmdline in noice, you'll need to un-comment
+        -- the setting below to disable messages as well.
+        -- See https://github.com/folke/noice.nvim/issues/560
         cmdline = {
             enabled = true,
             view = "cmdline_popup",
         },
+        -- messages = {
+        --     enabled = false,
+        -- },
         lsp = {
+            -- The following is the *second* signature popup I was seeing and
+            -- did not want and didn't even know was something noice did. Nice!
+            signature = {
+                enabled = false,
+            },
             -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
             override = {
                 ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
@@ -43,21 +54,51 @@ return {
             inc_rename = false,  -- enables an input dialog for inc-rename.nvim
             lsp_doc_border = false, -- add a border to hover docs and signature help
         },
+        -- It's worth noting that the "filter" options in this section are not
+        -- the usual negative filter-something-out, but rather by default are
+        -- to INCLUDE a thing that you want.
         routes = {
-            -- Enables mode messages, like macro recording. I have a status line
-            -- indicator, so I'm not using it for now.
-            -- {
-            --     view = "notify",
-            --     filter = { event = "msg_showmode" },
-            -- },
+            -- This filters out annoying code action messages from null-ls.
+            -- https://github.com/folke/noice.nvim/wiki/Configuration-Recipes#ignore-certain-lsp-servers-for-progress-messages
             {
                 filter = {
-                    event = "msg_show",
-                    kind = "",
-                    find = "",
+                    event = "lsp",
+                    kind = "progress",
+                    cond = function(message)
+                        local client = vim.tbl_get(message.opts, "progress", "client")
+                        return client == "null-ls"
+                    end,
                 },
                 opts = { skip = true },
             },
+            -- I probably shouldn't be doing this because deprecated stuff can
+            -- end up biting you, but I'm sick of the messages at startup.
+            {
+                filter = {
+                    find = "deprecated",
+                },
+                opts = { skip = true },
+            },
+            -- Show mode messages include notification of macro recording and
+            -- the insert/replace mode announcements. I find the former useful
+            -- and the latter annoying, so this selectively enables the one.
+            {
+                view = "notify",
+                filter = { 
+                    event = "msg_showmode",
+                    find = "recording",
+                },
+            },
+            -- This gets rid of messages like change of directory and such, the
+            -- utility of which I go back and forth on it seems.
+            -- {
+            --     filter = {
+            --         event = "msg_show",
+            --         kind = "",
+            --         find = "",
+            --     },
+            --     opts = { skip = true },
+            -- },
         },
     },
 }

@@ -1,5 +1,5 @@
-
 local configutils = require("utils.config-utils")
+local envutils = require("utils.env-utils")
 local telescope_utils = require("utils.telescope-utils")
 
 -- Uses my own custom entry to improve buffer selection. Cribbed from:
@@ -29,8 +29,8 @@ local search_snippets = function()
     local theme = require("telescope.themes").get_dropdown({
         layout_strategy = "horizontal", 
         layout_config = {
-            horizontal = { height = 0.5, width = 0.5 },
-            preview_width = 0.5,
+            horizontal = { height = 0.6, width = 0.85 },
+            preview_width = 0.4,
             prompt_position = "top", 
         },
     })
@@ -43,13 +43,14 @@ end
 --
 -- https://github.com/Ultra-Code/awesome-neovim/blob/master/lua/plugins/telescope.lua
 
--- this will return a function that calls telescope.
+-- this will return a function that calls telescope or pathogen.
 -- cwd will default to lazyvim.util.get_root
 -- for `files`, git_files or find_files will be chosen depending on .git
 local telescope_builtin = function(builtin, opts)
     local params = { builtin = builtin, opts = opts or {} }
 
     return function()
+        local pathogen = false
         builtin = params.builtin
         opts = params.opts
         if builtin == "files" then
@@ -58,21 +59,33 @@ local telescope_builtin = function(builtin, opts)
                 builtin = "git_files"
             else
                 builtin = "find_files"
+                pathogen = true
             end
             -- live_grep_from_project_git_root
         elseif builtin == "live_grep" then
+            pathogen = true
             if configutils.is_git_repo() then
                 opts.cwd = configutils.get_git_root()
             end
             -- This is my own little addition to prevent throwing errors when running
             -- a Git command (any that starts with "git_") when not in a Git repo.
+        elseif builtin == "grep_string" then
+            pathogen = true
         elseif string.sub(builtin, 1, 4) == "git_" then
             if not configutils.is_git_repo() then
                 print("Not inside a Git repo.")
                 return
             end
         end
-        require("telescope.builtin")[builtin](opts)
+        -- if pathogen then
+        --     -- vim.print(string.format(" Pathogen builtin -> %s", builtin))
+        --     -- vim.print(opts)
+        --     require("telescope").extensions["pathogen"][builtin](opts)
+        -- else
+            -- vim.print(string.format("Telescope builtin -> %s", builtin))
+            -- vim.print(opts)
+            require("telescope.builtin")[builtin](opts)
+        -- end
     end
 end
 
@@ -102,8 +115,10 @@ return {
         -- All the various add-ins I've enabled. See all the load-extension
         -- calls down below in the config method.
         { "nvim-telescope/telescope-ui-select.nvim" },
+        { "nvim-telescope/telescope-file-browser.nvim" },
         { 
             "nvim-telescope/telescope-fzf-native.nvim",
+            -- FIX: Find a more platform independent way to handle this.
             build = "make" -- Works on Linux/macOS, fails on Windows
         },
         { "nvim-telescope/telescope-live-grep-args.nvim" },
@@ -117,7 +132,7 @@ return {
         { "tsakirist/telescope-lazy.nvim" },
         { "polirritmico/telescope-lazy-plugins.nvim" },
         {
-            'prochri/telescope-all-recent.nvim',
+            "prochri/telescope-all-recent.nvim",
             dependencies = {
                 "nvim-telescope/telescope.nvim",
                 "kkharji/sqlite.lua",
@@ -136,6 +151,7 @@ return {
 
                 selection_chars = "123456789ABCDEF",
                 show_prompt = false,
+                -- FIX: Come up with a color-scheme related way to do this.
                 highlights = {
                     enabled = true,
                     statusline = {
@@ -165,21 +181,26 @@ return {
                 },
             },
         },
+        -- { "telescope-pathogen.nvim" },
+        { "brookhong/telescope-pathogen.nvim" },
+        { "SalOrak/whaler" },
     },
     cmd = "Telescope",
     -- List of builtins here: https://github.com/nvim-telescope/telescope.nvim?tab=readme-ov-file#pickers
     keys = {
         -- { "<leader><leader>", telescope_builtin("buffers", { show_all_buffers = true }),   desc = "Switch buffer", },
         { "<leader><leader>", search_buffers,                                              desc = "Switch buffer", },
-
+        -- File browser extension mapping.
+        { "<leader>fb", "<cmd>Telescope file_browser<cr>", desc = "Telescope file browser" },
         -- Git integrations, which used to throw an error if not in a Git directory (I fixed that).
         { "<leader>vb",       telescope_builtin("git_branches"),                           desc = "Git branches", },
         { "<leader>vc",       telescope_builtin("git_commits"),                            desc = "Git commits", },
-        { "<leader>vf",       telescope_builtin("git_files"),                              desc = "Git files (.gitignore)", },
+        -- I already have this built into my file search, so I don't need it.
+        -- { "<leader>vf",       telescope_builtin("git_files"),                              desc = "Git files (.gitignore)", },
+        { "<leader>vf",       telescope_builtin("git_bcommits"),                           desc = "Git file history", },
+        { "<leader>vl",       telescope_builtin("git_bcommits_range"),                     desc = "Git file line history", },
         { "<leader>vs",       telescope_builtin("git_status"),                             desc = "Git status", },
-        { "<leader>vS",       telescope_builtin("git_stash"),                              desc = "Git stash", },
-        { "<leader>vu",       telescope_builtin("git_bcommits"),                           desc = "Git buffer commits", },
-        { "<leader>vU",       telescope_builtin("git_bcommits_range"),                     desc = "Git buffer commits range", },
+        { "<leader>vt",       telescope_builtin("git_stash"),                              desc = "Git stash list", },
         -- LSP navigation.
         { "<leader>li",       telescope_builtin("lsp_implementations"),                    desc = "Search LSP implementations", },
         { "<leader>l<",       telescope_builtin("lsp_incoming_calls"),                     desc = "Search LSP incoming calls", },
@@ -188,7 +209,6 @@ return {
         { "<leader>lS",       telescope_builtin("lsp_workspace_symbols"),                  desc = "Search LSP workspace symbols", },
         { "<leader>lr",       telescope_builtin("lsp_references"),                         desc = "Search LSP references", },
         { "<leader>lw",       telescope_builtin("lsp_dynamic_workspace_symbols"),          desc = "Search LSP dynamic workspace symbols", },
-        -- Other [S]earch related bindings.
         { "<leader>s`",       search_sibling_files,                                        desc = "Search sibling files", },
         { "<leader>s.",       telescope_builtin("resume"),                                 desc = "Search . repeat", },
         { "<leader>s:",       telescope_builtin("command_history"),                        desc = "Search : command History", },
@@ -231,6 +251,7 @@ return {
         { "<leader>sT",       telescope_builtin("treesitter"),                             desc = "Search treesitter" },
         { "<leader>su",       "<cmd>Telescope undo<CR>",                                   desc = "Search undo" },
         { "<leader>sw",       telescope_builtin("grep_string"),                            desc = "Search word via grep", },
+        { "<leader>sW",       function () require("telescope").extensions.whaler.whaler() end, desc = "Cwd with Whaler" },
         { "<leader>sxt",      "<cmd>Telescope terraform_doc<CR>",                          desc = "Search extras - Terraform providers docs", },
         { "<leader>sxl",      "<cmd>Telescope lazy<CR>",                                   desc = "Search extras - Lazy plugin information", },
         { "<leader>sxL",      "<cmd>Telescope lazy_plugins<CR>",                           desc = "Search extras - Lazy plugin configuration", },
@@ -248,6 +269,9 @@ return {
                 -- Note the unique syntax because the name has a hyphen.
                 ["ui-select"] = {
                     require("telescope.themes").get_dropdown(),
+                },
+                file_browser = {
+                    theme = "ivy",
                 },
                 fzf = {
                     fuzzy = true,                    -- false will only do exact matching
@@ -332,6 +356,25 @@ return {
                         sorting_strategy = "ascending",
                         layout_strategy = "horizontal",
                     },
+                },
+                cder = opts,
+                -- pathogen = {
+                --     attach_mappings = function(map, actions)
+                --         map("i", "<C-o>", actions.proceed_with_parent_dir)
+                --         map("i", "<C-l>", actions.revert_back_last_dir)
+                --         map("i", "<C-b>", actions.change_working_directory)
+                --         map("i", "<C-g>g", actions.grep_in_result)
+                --         map("i", "<C-g>i", actions.invert_grep_in_result)
+                --     end,
+                --     -- remove below if you want to enable it
+                --     use_last_search_for_live_grep = false,
+                --     -- quick_buffer_characters = "asdfgqwertzxcvb",
+                --     prompt_prefix_length = 100
+                -- },
+                whaler = {
+                    auto_file_explorer = false,
+                    directories = envutils.get_env_data("whaler", "directories"),
+                    oneoff_directories = envutils.get_env_data("whaler", "oneoff_directories"),
                 },
             },
             defaults = {
@@ -429,6 +472,7 @@ return {
     config = function(_, opts)
         local telescope = require("telescope")
         telescope.setup(opts)
+        telescope.load_extension("file_browser")
         telescope.load_extension("fzf")
         telescope.load_extension("ui-select")
         telescope.load_extension("refactoring")
@@ -442,5 +486,7 @@ return {
         telescope.load_extension("luasnip")
         telescope.load_extension("lazy")
         telescope.load_extension("lazy_plugins")
+        -- telescope.load_extension("pathogen")
+        telescope.load_extension("whaler")
     end,
 }

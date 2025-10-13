@@ -70,6 +70,22 @@ local custom_menu_icon = {
 	Calc = " 󰃬 ",
 }
 
+-- My preferred default mappings, reused in multiple places below.
+local cmd_mapping = {
+	["<Up>"] = { c = cmp.mapping.select_prev_item() },
+	["<Down>"] = { c = cmp.mapping.select_next_item() },
+	["<C-Space>"] = { c = cmp.mapping.complete({}) },
+	["<C-n>"] = { c = cmp.mapping.select_next_item() },
+	["<C-p>"] = { c = cmp.mapping.select_prev_item() },
+	["<C-e>"] = { c = cmp.mapping.abort() },
+	["<C-y>"] = {
+		c = cmp.mapping.confirm({
+			behavior = cmp.ConfirmBehavior.Insert,
+			select = true,
+		}),
+	},
+}
+
 return {
 	"hrsh7th/nvim-cmp",
 	event = { "InsertEnter", "CmdlineEnter" },
@@ -78,24 +94,37 @@ return {
 		{ "saadparwaiz1/cmp_luasnip" },
 		-- Completion sources
 		{ "hrsh7th/cmp-nvim-lsp" }, -- neovim builtin LSP client
-		{ "hrsh7th/cmp-path" }, -- path
+		-- { "hrsh7th/cmp-path" }, -- path
+		{ "FelipeLema/cmp-async-path" },
 		{ "hrsh7th/cmp-buffer" }, -- buffer words
 		{ "hrsh7th/cmp-nvim-lua" }, -- nvim lua
 		{ "hrsh7th/cmp-emoji" }, -- emoji
+		{ "dmitmel/cmp-digraphs" },
 		{ "hrsh7th/cmp-cmdline" }, -- vim's cmdline.
 		{ "hrsh7th/cmp-calc" }, -- doing simple calculations
-		--"hrsh7th/cmp-omni",     -- Nvim's omnifunc
-
-		-- The following is the original plugin, which had issues, followed by
-		-- my new and original local copies for making it better. The final
-		-- plugin is my own fork of it until the author makes a proper fix.
+		{ "hrsh7th/cmp-omni" }, -- Nvim's omnifunc
 		{ "hrsh7th/cmp-nvim-lsp-document-symbol" }, -- improved searching through LSP data
-		--{ dir = "~/src/cnlds-new" },
-		--{ dir = "~/src/cnlds-original" },
-		-- { "JohnWilliston/cmp-nvim-lsp-document-symbol" },
-		-- { dir = "E:/Src/cmp-nvim-lsp-document-symbol" },
-
 		{ "chrisgrieser/cmp_yanky" },
+		{ "dmitmel/cmp-cmdline-history" },
+		{ "max397574/cmp-greek" },
+		{ "kristijanhusak/vim-dadbod-completion" },
+		{ "ray-x/cmp-sql" },
+		{
+			"SergioRibera/cmp-dotenv",
+			init = function()
+				-- Add a helpful function to dump all environment variables.
+				vim.api.nvim_create_user_command("DotEnvDumpAll", function()
+					local dotenv = require("cmp-dotenv.dotenv")
+					local vars = dotenv.get_all_env()
+					for var, tbl in pairs(vars) do
+						print(string.format("%s = %s", var, tbl.value or ""))
+					end
+				end, {})
+			end,
+		},
+
+		-- TODO: Look into https://github.com/teramako/cmp-cmdline-prompt.nvim
+		-- TODO: Look into https://github.com/andersevenrud/cmp-tmux
 	},
 	init = function()
 		-- I'm adding a custom Vim global to be able to toggle completion on
@@ -109,8 +138,8 @@ return {
 			disabled = disabled or (vim.api.nvim_get_option_value("buftype", { buf = 0 }) == "prompt")
 			disabled = disabled or (vim.fn.reg_recording() ~= "")
 			disabled = disabled or (vim.fn.reg_executing() ~= "")
-            -- Check the buffer variable to see if it's been disabled.
-            disabled = disabled or not configutils.is_buffer_completion_enabled(0)
+			-- Check the buffer variable to see if it's been disabled.
+			disabled = disabled or not configutils.is_buffer_completion_enabled(0)
 			-- The 'and' condition is all I added for a global toggle option.
 			return not disabled and vim.g.cmp
 		end,
@@ -143,15 +172,20 @@ return {
 				return vim_item
 			end,
 		},
-        
+
 		window = {
-			completion = cmp.config.window.bordered(),
-			-- completion = {
-			--     winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
-			--     col_offset = -3,
-			--     side_padding = 0,
-			-- },
-			documentation = cmp.config.window.bordered(),
+			completion = cmp.config.window.bordered({
+				border = "rounded",
+				winhighlight = "Normal:CmpPmenu,FloatBorder:DiffChange,CursorLine:PmenuSel,Search:None",
+				col_offset = -3,
+				side_padding = 2,
+			}),
+			documentation = cmp.config.window.bordered({
+				border = "rounded",
+				winhighlight = "Normal:CmpPmenu,FloatBorder:DiffChange,CursorLine:PmenuSel,Search:None",
+				col_offset = -3,
+				side_padding = 2,
+			}),
 		},
 
 		mapping = cmp.mapping.preset.insert({
@@ -175,6 +209,7 @@ return {
 					fallback()
 				end
 			end),
+
 			["<Tab>"] = cmp.mapping(function(fallback)
 				if cmp.visible() then
 					cmp.select_next_item()
@@ -197,12 +232,28 @@ return {
 		}),
 
 		sources = cmp.config.sources({
+			{ name = "lazydev" },
 			{ name = "nvim_lsp" },
-			{ name = "path" },
+			-- {
+			--              name = "path",
+			--              option = {
+			--                  trailing_slash = false,
+			--                  label_trailing_slash = false,
+			--              },
+			--          },
+			{
+				name = "async_path",
+				-- I can't seem to get these options to do anything.
+				option = {
+					trailing_slash = false,
+					label_trailing_slash = false,
+				},
+			},
 			{ name = "buffer" },
 			{ name = "nvim_lua" },
 			{ name = "luasnip" },
 			{ name = "emoji" },
+			{ name = "digraphs" },
 			{ name = "calc" },
 			{ name = "omni" },
 			{ name = "nvim_lsp_document_symbol" },
@@ -213,39 +264,76 @@ return {
 					minLength = 3,
 				},
 			},
+			{ name = "greek" },
+			{ name = "vim-dadbod-completion" },
+			{ name = "sql" },
+			{
+				name = "dotenv",
+				option = {
+					eval_on_confirm = false,
+				},
+			},
 		}),
 	},
 	config = function(_, opts)
 		local cmp = require("cmp")
 		cmp.setup(opts)
 
-		-- This is my prior configuration before nvim_lsp_document_symbols.
-		-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-		-- cmp.setup.cmdline({ "/", "?" }, {
-		--     mapping = cmp.mapping.preset.cmdline(),
-		--     sources = {
-		--         { name = "buffer" },
-		--     },
-		-- })
+		-- Command-line history setup for all but commands.
+		for _, cmd_type in ipairs({ "/", "?", "@" }) do
+			cmp.setup.cmdline(cmd_type, {
+				mapping = cmd_mapping,
+				sources = {
+					{ name = "cmdline_history" },
+					{ name = "buffer" },
+				},
+			})
+		end
 
-		cmp.setup.cmdline({ "/", "?" }, {
-			mapping = cmp.mapping.preset.cmdline(),
-			sources = cmp.config.sources({
-				{ name = "nvim_lsp_document_symbol" },
-			}, {
-				{ name = "buffer" },
-			}),
-		})
-
-		-- `:` cmdline setup.
+		-- Command-line history setup for commands.
 		cmp.setup.cmdline(":", {
-			mapping = cmp.mapping.preset.cmdline(),
+			mapping = cmd_mapping,
+			-- mapping = cmp.mapping.preset.cmdline({
+			--     ["<C-n>"] = select_or_fallback(cmp.select_next_item),
+			--     ["<C-p>"] = select_or_fallback(cmp.select_prev_item),
+			-- }),
+			-- mapping = cmp.mapping.preset.cmdline({
+			--     ["<C-n>"] = { c = cmp.mapping.select_next_item() },
+			--     ["<C-p>"] = { c = cmp.mapping.select_prev_item() },
+			-- }),
+			-- mapping = cmp.mapping.preset.cmdline(
+			--              {
+			--                  -- Use default nvim history scrolling
+			--                  ["<C-n>"] = {
+			--                      c = false,
+			--                  },
+			--                  ["<C-p>"] = {
+			--                      c = false,
+			--                  },
+			--              }
+			--          ),
 			sources = cmp.config.sources({
-				{ name = "path" },
+				-- {
+				-- 	name = "path",
+				-- 	option = {
+				-- 		trailing_slash = false,
+				-- 		label_trailing_slash = false,
+				-- 	},
+				-- },
+				{ name = "cmdline_history" },
 				{
 					name = "cmdline",
 					option = {
 						ignore_cmds = { "Man", "!" },
+					},
+				},
+				{ name = "buffer" },
+				{
+					name = "async_path",
+					-- I can't seem to get these options to do anything.
+					option = {
+						trailing_slash = false,
+						label_trailing_slash = false,
 					},
 				},
 			}),

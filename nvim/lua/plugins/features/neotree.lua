@@ -169,8 +169,10 @@ return {
                     ["P"] = { "toggle_preview", config = { use_float = true, use_image_nvim = true } },
                     -- Read `# Preview Mode` for more information
                     ["l"] = "focus_preview",
-                    ["S"] = "open_split",
-                    ["s"] = "open_vsplit",
+                    ["x"] = "open_split",
+                    ["v"] = "open_vsplit",
+                    ["<C-x>"] = "open_split",
+                    ["<C-v>"] = "open_vsplit",
                     -- ["S"] = "split_with_window_picker",
                     -- ["s"] = "vsplit_with_window_picker",
                     ["t"] = "open_tabnew",
@@ -194,7 +196,7 @@ return {
                     ["d"] = "delete",
                     ["r"] = "rename",
                     ["y"] = "copy_to_clipboard",
-                    ["x"] = "cut_to_clipboard",
+                    ["X"] = "cut_to_clipboard",
                     ["p"] = "paste_from_clipboard",
                     ["c"] = "copy", -- takes text input for destination, also accepts the optional config.show_path option like "add":
                     -- ["c"] = {
@@ -340,7 +342,7 @@ return {
                 window = {
                     mappings = {
                         ["bd"] = "buffer_delete",
-                        ["d"] = "buffer_delete", -- remap to NOT delete file!
+                        ["dd"] = "buffer_delete", -- remap to NOT delete file!
                         ["-"] = "navigate_up",
                         ["."] = "set_root",
                         ["o"] = { "show_help", nowait = false, config = { title = "Order by", prefix_key = "o" } },

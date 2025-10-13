@@ -7,18 +7,89 @@
 -- out, I can absolutely see how heirline is more powerful and customizable, but
 -- I'm not sure it was worth the effort. Perhaps it will be once I better grasp
 -- its subtleties, particularly in terms of graphical flair.
+
+local log = require("utils.log-utils").create_logger("heirline")
+
+-- This leverages a clever bit of Lua pattern matching as ^%l matches the first
+-- lowercase letter and passing the string.upper function as the replacement
+-- argument means Lua will call that function with the pattern as its arg:
+-- https://www.lua.org/manual/5.1/manual.html#pdf-string.gsub
+local function firstToUpper(str)
+    return (str:gsub("^%l", string.upper))
+end
+
+-- The following methods warrant some discussion. They're here to supoport my
+-- heirline hydra component down below because it's the only way I could find to
+-- get the status line to update reliably after a hydra finishes. It's easy
+-- enough to set the update method to include the "CursorMoved" autocmd, and 
+-- that works great while the user is still pressing keys, but when the user
+-- presses escape to dismiss the hydra the heirline indicator showing its active
+-- just sits there even though the hydra is gone. I could find no sort of "idle"
+-- event to trap to make sure it gets cleared. 
+--
+-- So that's when I turned to something like a timer to make sure it's cleared
+-- after the hydra has finished. At first I experimented with a custom user 
+-- autocmd to get the hydra component to update itself, but nothing I did seemed
+-- to work properly. I'm still confused about that. I had a custom user autocmd
+-- firing, and I know that because I could vim.print to prove it, but for 
+-- whatever reason the redraw wasn't happening as desired. The component would
+-- not "go away" after the hydra was exited. I was never able to find a working
+-- configuration that would make that happen relying solely on the component.
+--
+-- The short version of the story is that my hydra component checks if a timer
+-- is set when it notices a hydra is active. If not, then it sets the timer.
+-- The callback function below then checks for an active hydra and when it 
+-- doesn't find one but does still have a callback timer defined, then it 
+-- schedules a function call to clear the timer, set it to nil, and then force
+-- one last update of the status line. I should note that I was originally 
+-- using the vim.defer_fn method to do that until I learned about vim.schedule.
+
+-- Taken from https://neovim.io/doc/user/luvref.html#_%60uv_timer_t%60-%E2%80%94-timer-handle
+-- Creating a simple setInterval wrapper
+local function setIntervalTimer(interval, callback)
+    local timer = vim.uv.new_timer()
+    timer:start(interval, interval, function ()
+        callback()
+    end)
+    return timer
+end
+
+local function clearIntervalTimer(timer)
+    timer:stop()
+    timer:close()
+end
+
+local hydraTimer = nil
+local function hydraTimerCallback()
+    local hydra = require("hydra.statusline")
+    if not hydra.is_active() then
+        if hydraTimer then
+            -- vim.defer_fn(function ()
+            --     clearInterval(callback_timer)
+            --     callback_timer = nil
+            --     vim.cmd.redrawstatus()
+            -- end, 100)
+            vim.schedule(function ()
+                clearIntervalTimer(hydraTimer)
+                hydraTimer = nil
+                vim.cmd.redrawstatus()
+            end)
+        end
+    end
+end
+
 return {
     "rebelot/heirline.nvim",
     dependencies = {
         "Zeioth/heirline-components.nvim",
         "SmiteshP/nvim-navic",
     },
-    enabled = true,
     config = function()
         local heirline = require("heirline")
         local utils = require("heirline.utils")
         local conditions = require("heirline.conditions")
         local lib = require("heirline-components.all")
+        local configutils = require("utils.config-utils")
 
         -- This might well be more trouble than it's worth, but I'm trying to
         -- make my heirline configuration colorscheme independent. The way one
@@ -373,6 +444,24 @@ return {
 
         local gitBlock = {
             condition = conditions.is_git_repo,
+            
+            -- condition = function (self)
+            --     -- return configutils.is_git_repo()
+            --     return true
+            -- end,
+
+            -- condition = function (self)
+            --     local b = conditions.is_git_repo()
+            --     vim.print(string.format("is_git_repo() = %s", b)) 
+            --     return b
+            -- end,
+
+            -- BUG: Why does using this cause the init function to die?
+            -- condition = function (self)
+            --     local b = configutils.is_git_repo()
+            --     vim.print(string.format("configutils.is_git_repo() = %s", b)) 
+            --     return b
+            -- end,
 
             init = function(self)
                 self.status_dict = vim.b.gitsigns_status_dict
@@ -628,26 +717,67 @@ return {
             },
         }
 
-        -- Not sure why I could never get this working at all.
+        -- The following commit fixed my hydra status line issue:
+        -- https://github.com/nvimtools/hydra.nvim/commit/8c4a9f621ec7cdc30411a1f3b6d5eebb12b469dc
         local hydraBlock = {
-            static = {
-                evalCount = 0,
-            },
-            -- condition = require("hydra.statusline").is_active(),
-            -- provider = "HAIL HYDRA!!!",
-            -- provider = require("hydra.statusline").get_hint(),
-            provider = function(self)
-                self.evalCount = self.evalCount + 1
-                local active = require("hydra.statusline").is_active()
-                local hydraName = require("hydra.statusline").get_name()
-                local color = require("hydra.statusline").get_color()
-                return string.format("Hydra: %d active(%s) name(%s) ", self.evalCount, active, hydraName)
+            -- Only show the hydra block when a hydra is active. 
+            condition = function ()
+                local hydra = require("hydra.statusline")
+                return hydra.is_active()
             end,
-            hl = { fg = colors.bright_green },
-            update = "CursorMoved",
-            -- update = function ()
-            --     require("hydra.statusline").is_active()
-            -- end,
+            provider = function(self)
+                local hydra = require("hydra.statusline")
+                local hydraName = hydra.get_name()
+                if hydra.is_active() == true and hydraName ~= nil then
+                    -- If we're going to be showing a hydra name on the status
+                    -- line, then we set the timer to make sure we stop too.
+                    if hydraTimer == nil then
+                        hydraTimer = setIntervalTimer(1000, hydraTimerCallback)
+                    end
+                    return hydraName .. " "
+                end
+                return nil
+            end,
+            hl = function (self)
+                -- return { fg = colors.bright_green }
+                -- Looks like maybe I should be able to get the mode color from
+                -- the hydra component itself or something?
+                -- https://github.com/rebelot/heirline.nvim/issues/220
+
+                -- Turns out the hydra plugin defines different highlight groups
+                -- for its various hydra colors. For example, "HydraPink" will 
+                -- be the color it uses for the status line updates for all pink
+                -- hydras. So the following gets the highlight group for the
+                -- active hydra and uses that color for the indicator.
+                local hydra = require("hydra.statusline")
+                if hydra.is_active() then
+                    local name = hydra.get_color()
+                    local hl = "Hydra" .. firstToUpper(name)
+                    local color = vim.api.nvim_get_hl(0, { name = hl })
+                    return color
+                end
+            end,
+            update = {
+                "CursorMoved",
+                "BufEnter",
+                "OptionSet",
+                "User", pattern = "HeirlineUpdate",
+            },
+        }
+
+        local pomodoroBlock = {
+            condition = function (self)
+                -- I found an easier way to detect the pomodoro's status.
+                return require("pomodoro").phase > 0
+                -- local status = require("pomodoro").get_pomodoro_status("🍅❌","🍅","☕")
+                -- -- I'm guessing we need characters 1 - 7 for Unicode reasons.
+                -- local active = ( string.sub(status, 1, 7) ~= "🍅❌" )
+                -- -- vim.print(string.format("pomodoro status %s is %s", status, active))
+                -- return active
+            end,
+            provider = function (self)
+                return require("pomodoro").get_pomodoro_status("🍅❌","🍅","☕") .. " "
+            end
         }
 
         local finalStatusLine = {
@@ -661,12 +791,13 @@ return {
             fileNameBlock,
             singleSpace,
             --troubleSymbols,
-            -- hydraBlock,
+            hydraBlock,
             navicSymbolsBlock,
             lib.component.fill(),
             aiCodeCompanionBlock,
             macroRecorderBlock,
             spellCheckBlock,
+            pomodoroBlock,
             --lib.component.cmd_info(cmdInfo),
             {
                 provider = "",
@@ -997,7 +1128,7 @@ return {
                 },
             })
 
-            vim.keymap.set("n", "<leader>bp", function()
+            vim.keymap.set("n", "<leader>tp", function()
                 local tabline = require("heirline").tabline
                 local buflist = tabline._buflist[1]
                 buflist._picker_labels = {}
@@ -1016,5 +1147,6 @@ return {
         -- Yep, with heirline we're driving manual!
         vim.o.showtabline = 2
         vim.cmd([[au FileType * if index(['wipe', 'delete'], &bufhidden) >= 0 | set nobuflisted | endif]])
+
     end,
 }

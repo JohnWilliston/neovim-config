@@ -32,7 +32,7 @@ require("lazy").setup({
         -- folder again.
         -- { import = "plugins", },
         { import = "plugins.features", },
-        { import = "plugins.lsp", },
+        { import = "plugins.completion", },
         { import = "plugins.ui", },
     },
     -- Configure any other settings here. See the documentation for more details.

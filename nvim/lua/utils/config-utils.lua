@@ -88,7 +88,8 @@ end
 
 -- A simple little utility function to extract the path component from a filename.
 local function getPath(str)
-    return str:match("(.*[/\\])")
+    -- return str:match("(.*[/\\])")
+    return vim.fs.dirname(str)
 end
 
 -- Gets the file path from the filename of the current buffer.

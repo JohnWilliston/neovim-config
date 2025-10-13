@@ -293,9 +293,14 @@ return {
         -- workspaces or work with multiple vaults. The plugin seems quite
         -- flexible in that regard.
         workspaces = {
+            -- FIX: Find a better way to handle across platforms/devices.
             {
-                name = "DEFCON",
-                path = "~/Documents/Obsidian/DEFCON",
+                name = "CACI",
+                path = "~/Documents/Obsidian/CACI",
+            },
+            {
+                name = "Personal",
+                path = "~/Documents/Obsidian/Personal",
             },
         },
 

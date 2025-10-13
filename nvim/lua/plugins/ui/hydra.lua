@@ -277,6 +277,34 @@ local function hydra_window_navigate()
     }
 end
 
+local function hydra_treewalker()
+    return {
+        name = "Hydra Treewalker",
+        mode = "n",
+        body = "<leader>wt",
+        config = {
+            color = "pink",
+            invoke_on_body = true,
+            -- This makes the hint appear properly when using noice. NB: the 
+            -- status line won't work for navigation unless it's in every 
+            -- window, so we use the window instead.
+            hint = {
+                type = "window",
+            },
+        },
+        heads = {
+            { "h", "<cmd>Treewalker Left<cr>" },
+            { "l", "<cmd>Treewalker Right<cr>", { desc = "←/→" } },
+            { "j", "<cmd>Treewalker Down<cr>" },
+            { "k", "<cmd>Treewalker Up<cr>", { desc = "↑/↓" } },
+            { "H", "<cmd>Treewalker SwapLeft<cr>" },
+            { "L", "<cmd>Treewalker SwapRight<cr>", { desc = "Swap ←/→" } },
+            { "J", "<cmd>Treewalker SwapDown<cr>" },
+            { "K", "<cmd>Treewalker SwapUp<cr>", { desc = "Swap ↑/↓" } },
+        }
+    }
+end
+
 return {
     -- "anuvyklack/hydra.nvim",     -- The original hydra plugin
     -- dir = "E:/Src/hydra.nvim",   -- My own source for debugging
@@ -290,6 +318,7 @@ return {
         hydra(hydra_window_pan())
         hydra(hydra_window_navigate())
         hydra(hydra_window_move())
+        hydra(hydra_treewalker())
     end,
 }
 

@@ -29,10 +29,9 @@
 
 return {
     "LintaoAmons/bookmarks.nvim",
-    enabled = true,
-    -- pin the plugin at specific version for stability
-    -- backup your bookmark sqlite db when there are breaking changes
-    -- tag = "v2.3.0",
+    -- If you let it lazy-load, any bookmarks won't be visible until you invoke
+    -- one of the commands manually, which isn't what I want.
+    lazy = false,
     dependencies = {
         { "kkharji/sqlite.lua" },
         { "nvim-telescope/telescope.nvim" },
@@ -54,21 +53,23 @@ return {
         { "<leader>mn", "<cmd>BookmarksGotoPrevInList<cr>", desc = "Bookmarks go to next" },
         { "<leader>sm", "<cmd>BookmarksGoto<cr>",           desc = "Search bookmarks" },
     },
-    init = function()
-        -- I have to point this thing to the SQLite3 DLL manually on Windows.
-        -- Downloads here: https://www.sqlite.org/download.html
-        -- Choose the "Precompiled Binaries for Windows" option.
-        if vim.loop.os_uname().sysname == "Windows_NT" then
-            vim.g.sqlite_clib_path = vim.fs.normalize("~/sqlite3.dll")
-        end
-    end,
+    -- init = function()
+    --     -- I have to point this thing to the SQLite3 DLL manually on Windows.
+    --     -- Downloads here: https://www.sqlite.org/download.html
+    --     -- Choose the "Precompiled Binaries for Windows" option.
+    --     if vim.loop.os_uname().sysname == "Windows_NT" then
+    --         -- FIX: Find a more platform independent way to handle this.
+    --         vim.g.sqlite_clib_path = vim.fs.normalize("~/sqlite3.dll")
+    --     end
+    -- end,
     opts = {
         signs = {
             -- Sign mark icon and color in the gutter
             mark = {
                 icon = "󰃁",
                 color = "Magenta",
-                line_bg = "#0a0b16", -- My preferred Tokyonight background color.
+                -- Use the default normal background color, whatever that is.
+                line_bg = vim.api.nvim_get_hl_by_name("Normal", true).bg,
             },
             desc_format = function(bookmark)
                 ---@cast bookmark Bookmarks.Node

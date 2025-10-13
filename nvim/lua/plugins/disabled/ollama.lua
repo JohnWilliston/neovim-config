@@ -1,12 +1,10 @@
 
-
 -- I have Ollama installed locally on the MacBook Pro, so I switch the url.
 local ollamaUrl = "http://ancalagon:11434"
-local ollamaModel = "deepseek-coder-v2-fixed"
+local ollamaModel = "granite3.1-dense"
 
 if (vim.loop.os_uname().sysname == "Darwin") then
     ollamaUrl = "http://localhost:11434"
-    ollamaModel = "deepseek-coder-v2"
 end
 
 return {

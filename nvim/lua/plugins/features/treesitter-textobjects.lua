@@ -19,9 +19,9 @@ return {
 		},
 	},
 	dependencies = {
-		"nvim-treesitter/nvim-treesitter",
+		{ "nvim-treesitter/nvim-treesitter" },
 	},
-	lazy = true,
+    event = "VeryLazy",
 	opts = {
 		textobjects = {
 			select = {
@@ -50,8 +50,8 @@ return {
 					["ai"] = { query = "@conditional.outer", desc = "A conditional" },
 					["ii"] = { query = "@conditional.inner", desc = "Inner conditional" },
 
-					["al"] = { query = "@loop.outer", desc = "A loop" },
-					["il"] = { query = "@loop.inner", desc = "Inner loop" },
+					["ar"] = { query = "@loop.outer", desc = "A repeat (loop)" },
+					["ir"] = { query = "@loop.inner", desc = "Inner repeat (loop)" },
 
 					["aj"] = { query = "@call.outer", desc = "A jump" },
 					["ij"] = { query = "@call.inner", desc = "Inner jump" },
@@ -87,14 +87,14 @@ return {
 			swap = {
 				enable = true,
 				swap_next = {
-					["<leader>xcn"] = "@class.outer",
-					["<leader>xfn"] = "@function.outer",
-					["<leader>xpn"] = "@parameter.inner",
+					["<leader>lxcn"] = "@class.outer",
+					["<leader>lxfn"] = "@function.outer",
+					["<leader>lxpn"] = "@parameter.inner",
 				},
 				swap_previous = {
-					["<leader>xcp"] = "@class.outer",
-					["<leader>xfp"] = "@function.outer",
-					["<leader>xpp"] = "@parameter.inner",
+					["<leader>lxcp"] = "@class.outer",
+					["<leader>lxfp"] = "@function.outer",
+					["<leader>lxpp"] = "@parameter.inner",
 				},
 			},
 			move = {
@@ -138,11 +138,11 @@ return {
 			},
 		},
 	},
-	-- I don't understand why this function must be called here, but you'll
-	-- get an error message about how the treesitter config wasn't called
-	-- if you don't keep this line here.
-	-- TODO: Figure out some better way to configure this.
 	config = function(_, opts)
+        -- For some time I didn't understand why I needed to do this. Now I do:
+        -- because you have to register these bits of configuration with the
+        -- treesitter plugin itself, which makes tnose "modules" available for
+        -- use with all the given key maps and parameters.
 		require("nvim-treesitter.configs").setup(opts)
 	end,
 }

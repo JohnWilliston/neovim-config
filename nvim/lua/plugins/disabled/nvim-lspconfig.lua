@@ -42,7 +42,7 @@ return {
                     return vim.version.gt(vim.version(), { 0, 9, 0 })
                 end,
                 handler_opts = {
-                    border = float.border,
+                    border = "rounded",
                 },
                 toggle_key = "<C-s>",
             },

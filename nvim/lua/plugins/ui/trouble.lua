@@ -3,8 +3,8 @@
 -- other stuff like that, when in reality it's just a tool to show you popup
 -- and other windows with lists of things. And then I didn't at all grasp from
 -- reading the main page (or docs) that while the plugin has a fairly small and
--- well defined number of built-in "modes", from which you can "inherit" to
--- define as many of your own customizations as you want.
+-- well defined number of built-in "modes", you can "inherit" to define as many 
+-- of your own customizations as you want.
 --
 -- For example, the built-in sources include diagnostics, fzf, a whole bunch of
 -- lsp stuff defined programmatically (from an initial 'lsp_base' mode that isn't
@@ -19,7 +19,6 @@ return {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     cmd = "Trouble",
     keys = {
-
         { "<leader>cd", "<cmd>Trouble diagnostics toggle filter.buf=0<CR>", desc = "Buffer Diagnostics (Trouble)" },
         { "<leader>cD", "<cmd>Trouble diagnostics toggle<CR>",              desc = "Diagnostics (Trouble)" },
         { "<leader>cf", "<cmd>Trouble qflist toggle<CR>",                   desc = "Quickfix List (Trouble)" },
@@ -34,6 +33,11 @@ return {
         { "<leader>ctf", "<cmd>Trouble telescope_files toggle<CR>",     desc = "Telescope files sent to trouble" },
         -- My custom function to close all the open trouble views.
         { "<leader>cq",  require("utils.config-utils").troubleclose,    desc = "Close all Trouble views" },
+
+        -- This override the default prevoius/next tab key mappings. I figure
+        -- that's fine as I have my own anyway.
+        { "]t",  "<cmd>Trouble next jump=true<CR>", desc = "Trouble next item" },
+        { "[t",  "<cmd>Trouble prev jump=true<CR>", desc = "Trouble prev item" },
     },
     opts = {
         modes = {

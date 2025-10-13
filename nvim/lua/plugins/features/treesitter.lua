@@ -3,10 +3,6 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     cmd = { "TSInstall", "TSBufEnable", "TSBufDisable", "TSModuleInfo" },
     build = ":TSUpdate",
-    lazy = true,
-    dependencies = {
-        "nvim-treesitter/nvim-treesitter-textobjects",
-    },
     opts = {
         -- A list of parser names, or "all" (the listed parsers MUST always be installed)
         ensure_installed = {
@@ -53,7 +49,7 @@ return {
         incremental_selection = {
             enable = true,
             keymaps = {
-                init_selection = "<leader>i",
+                init_selection = "<leader>ei",
                 node_incremental = "<C-n>",
                 node_decremental = "<C-p>",
                 scope_incremental = "<C-s>",
@@ -61,7 +57,6 @@ return {
         },
     },
     config = function (_, opts)
-        local configs = require("nvim-treesitter.configs")
-        configs.setup(opts)
+        require("nvim-treesitter.configs").setup(opts)
     end,
 }

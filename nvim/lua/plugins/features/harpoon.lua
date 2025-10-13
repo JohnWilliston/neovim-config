@@ -1,9 +1,15 @@
 -- The good news: I figured out how to customize it to display exactly what
--- I wanted in its own UI and telescope.
--- The bad news: it updates your bloody mark positions when you move the cursor.
--- So it's really more a gateway to files you've used than marked positions in
--- those files. It also keeps losing my marks every time I close Neovim. I don't
--- think it's going to work for me until some things get fixed.
+-- I wanted in its own UI and telescope. The not so good news is that this
+-- plugin really gave me fits with how it seemed to not handle state properly
+-- when changing projects using the auto-session plugin. A contributor on 
+-- GitHub figured out how to get it working, so I've updated the auto-session
+-- plugin spec with commands to update the harpoon data in memory.
+--
+-- Because I had switched to using a bookmark plugin instead, I'm not ready to
+-- come back to this entirely as my solution for managing permanent marks. I'm 
+-- going to test drive this for a while and see if I even need it. So for now,
+-- I'm changing its commands to be hooked up to <leader>h instead of my usual
+-- <leader>m for marks. We'll see how this goes.
 
 -- Helper function to dump harpoon marks to a new buffer.
 local function dump_harpoon_marks()
@@ -122,47 +128,37 @@ return {
             }):find()
         end
 
-        vim.keymap.set("n", "<leader>md", dump_harpoon_marks, { desc = "Dump harpoon marks" } )
-        vim.keymap.set("n", "<leader>ml", function() harpoon.logger:show() end, { desc = "Dump harpoon log" } )
-        vim.keymap.set("n", "<leader>ma", function() harpoon:list():add() end, { desc = "Add harpoon mark" })
+        vim.keymap.set("n", "<leader>hd", dump_harpoon_marks, { desc = "Dump harpoons" } )
+        vim.keymap.set("n", "<leader>hl", function() harpoon.logger:show() end, { desc = "Dump harpoon log" } )
+        vim.keymap.set("n", "<leader>ha", function() harpoon:list():add() end, { desc = "Add harpoon mark" })
 
         -- NB: Using the replace methods can screw up the list if you don't 
         -- use them correclty; i.e., target a mark that actually exists.
-        vim.keymap.set("n", "<leader>m1", function() harpoon:list():replace_at(1) end, { desc = "Set harpoon mark 1" })
-        vim.keymap.set("n", "<leader>m2", function() harpoon:list():replace_at(2) end, { desc = "Set harpoon mark 2" })
-        vim.keymap.set("n", "<leader>m3", function() harpoon:list():replace_at(3) end, { desc = "Set harpoon mark 3" })
-        vim.keymap.set("n", "<leader>m4", function() harpoon:list():replace_at(4) end, { desc = "Set harpoon mark 4" })
-        vim.keymap.set("n", "<leader>m5", function() harpoon:list():replace_at(5) end, { desc = "Set harpoon mark 5" })
-        vim.keymap.set("n", "<leader>m6", function() harpoon:list():replace_at(6) end, { desc = "Set harpoon mark 6" })
-        vim.keymap.set("n", "<leader>m7", function() harpoon:list():replace_at(7) end, { desc = "Set harpoon mark 7" })
-        vim.keymap.set("n", "<leader>m8", function() harpoon:list():replace_at(8) end, { desc = "Set harpoon mark 8" })
-        vim.keymap.set("n", "<leader>m9", function() harpoon:list():replace_at(9) end, { desc = "Set harpoon mark 9" })
+        vim.keymap.set("n", "<leader>h1", function() harpoon:list():replace_at(1) end, { desc = "Set harpoon 1" })
+        vim.keymap.set("n", "<leader>h2", function() harpoon:list():replace_at(2) end, { desc = "Set harpoon 2" })
+        vim.keymap.set("n", "<leader>h3", function() harpoon:list():replace_at(3) end, { desc = "Set harpoon 3" })
+        vim.keymap.set("n", "<leader>h4", function() harpoon:list():replace_at(4) end, { desc = "Set harpoon 4" })
+        vim.keymap.set("n", "<leader>h5", function() harpoon:list():replace_at(5) end, { desc = "Set harpoon 5" })
+        vim.keymap.set("n", "<leader>h6", function() harpoon:list():replace_at(6) end, { desc = "Set harpoon 6" })
+        vim.keymap.set("n", "<leader>h7", function() harpoon:list():replace_at(7) end, { desc = "Set harpoon 7" })
+        vim.keymap.set("n", "<leader>h8", function() harpoon:list():replace_at(8) end, { desc = "Set harpoon 8" })
+        vim.keymap.set("n", "<leader>h9", function() harpoon:list():replace_at(9) end, { desc = "Set harpoon 9" })
 
-        vim.keymap.set("n", "<leader>g1", function() harpoon:list():select(1) end, { desc = "Goto harpoon mark 1" })
-        vim.keymap.set("n", "<leader>g2", function() harpoon:list():select(2) end, { desc = "Goto harpoon mark 2" })
-        vim.keymap.set("n", "<leader>g3", function() harpoon:list():select(3) end, { desc = "Goto harpoon mark 3" })
-        vim.keymap.set("n", "<leader>g4", function() harpoon:list():select(4) end, { desc = "Goto harpoon mark 4" })
-        vim.keymap.set("n", "<leader>g5", function() harpoon:list():select(5) end, { desc = "Goto harpoon mark 5" })
-        vim.keymap.set("n", "<leader>g6", function() harpoon:list():select(6) end, { desc = "Goto harpoon mark 6" })
-        vim.keymap.set("n", "<leader>g7", function() harpoon:list():select(7) end, { desc = "Goto harpoon mark 7" })
-        vim.keymap.set("n", "<leader>g8", function() harpoon:list():select(8) end, { desc = "Goto harpoon mark 8" })
-        vim.keymap.set("n", "<leader>g9", function() harpoon:list():select(9) end, { desc = "Goto harpoon mark 9" })
+        vim.keymap.set("n", "<leader>1", function() harpoon:list():select(1) end, { desc = "Goto harpoon 1" })
+        vim.keymap.set("n", "<leader>2", function() harpoon:list():select(2) end, { desc = "Goto harpoon 2" })
+        vim.keymap.set("n", "<leader>3", function() harpoon:list():select(3) end, { desc = "Goto harpoon 3" })
+        vim.keymap.set("n", "<leader>4", function() harpoon:list():select(4) end, { desc = "Goto harpoon 4" })
+        vim.keymap.set("n", "<leader>5", function() harpoon:list():select(5) end, { desc = "Goto harpoon 5" })
+        vim.keymap.set("n", "<leader>6", function() harpoon:list():select(6) end, { desc = "Goto harpoon 6" })
+        vim.keymap.set("n", "<leader>7", function() harpoon:list():select(7) end, { desc = "Goto harpoon 7" })
+        vim.keymap.set("n", "<leader>8", function() harpoon:list():select(8) end, { desc = "Goto harpoon 8" })
+        vim.keymap.set("n", "<leader>9", function() harpoon:list():select(9) end, { desc = "Goto harpoon 9" })
 
-        vim.keymap.set("n", "<leader>1", function() harpoon:list():select(1) end, { desc = "Goto harpoon mark 1" })
-        vim.keymap.set("n", "<leader>2", function() harpoon:list():select(2) end, { desc = "Goto harpoon mark 2" })
-        vim.keymap.set("n", "<leader>3", function() harpoon:list():select(3) end, { desc = "Goto harpoon mark 3" })
-        vim.keymap.set("n", "<leader>4", function() harpoon:list():select(4) end, { desc = "Goto harpoon mark 4" })
-        vim.keymap.set("n", "<leader>5", function() harpoon:list():select(5) end, { desc = "Goto harpoon mark 5" })
-        vim.keymap.set("n", "<leader>6", function() harpoon:list():select(6) end, { desc = "Goto harpoon mark 6" })
-        vim.keymap.set("n", "<leader>7", function() harpoon:list():select(7) end, { desc = "Goto harpoon mark 7" })
-        vim.keymap.set("n", "<leader>8", function() harpoon:list():select(8) end, { desc = "Goto harpoon mark 8" })
-        vim.keymap.set("n", "<leader>9", function() harpoon:list():select(9) end, { desc = "Goto harpoon mark 9" })
+        vim.keymap.set("n", "<leader>hp", function() harpoon:list():prev() end, { desc = "Goto previous harpoon" } )
+        vim.keymap.set("n",  "<leader>hn", function() harpoon:list():next() end, { desc = "Goto next harpoon" } )
 
-        vim.keymap.set("n", "<leader>mp", function() harpoon:list():prev() end, { desc = "Go to previous mark" } )
-        vim.keymap.set("n",  "<leader>mn", function() harpoon:list():next() end, { desc = "Go to next mark" } )
-
-        vim.keymap.set("n", "<leader>mm", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = "Open harpoon window" })
-        vim.keymap.set("n", "<leader>sh", function() toggle_telescope(harpoon:list()) end, { desc = "Search harpoon marks" })
+        vim.keymap.set("n", "<leader>hh", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = "Open harpoon window" })
+        vim.keymap.set("n", "<leader>sh", function() toggle_telescope(harpoon:list()) end, { desc = "Search harpoons" })
 
     end,
 }

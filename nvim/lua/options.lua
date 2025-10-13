@@ -23,7 +23,7 @@ vim.o.undofile = true
 vim.o.wrap = false
 vim.o.swapfile = false
 vim.o.backup = false
-vim.o.colorcolumn="81"
+vim.o.colorcolumn = "81"
 
 -- Diagnosing my weird backspace issues.
 -- vim.opt.backspace = { "indent", "eol", "start" }
@@ -47,7 +47,7 @@ vim.cmd("filetype plugin indent on")
 
 -- Enable default clipping to the system clipboard.
 --vim.api.nvim_set_option("clipboard", "unnamedplus")
-vim.opt.clipboard:append { "unnamedplus", "unnamed" }
+vim.opt.clipboard:append({ "unnamedplus", "unnamed" })
 
 -- Enable virtual editing to let the cursor go where no text exists when in block mode.
 vim.o.virtualedit = "block"
@@ -66,32 +66,32 @@ vim.g.have_nerd_font = true
 
 -- Option customizations for running Neovide.
 if vim.g.neovide then
-    local fontName = "0xProto Nerd Font:h13"
-    -- We boost the size on macOS, presumably due to the higher DPI or something.
-    if vim.loop.os_uname().sysname == "Darwin" then
-        fontName =  "0xProto Nerd Font:h16"
-    end
-    vim.o.guifont = fontName
+	local fontName = "0xProto Nerd Font:h13"
+	-- We boost the size on macOS, presumably due to the higher DPI or something.
+	if vim.loop.os_uname().sysname == "Darwin" then
+		fontName = "0xProto Nerd Font:h16"
+	end
+	vim.o.guifont = fontName
 end
 
 -- This helpful little gem lets me redirect command output to a buffer.
 -- https://www.reddit.com/r/neovim/comments/zhweuc/whats_a_fast_way_to_load_the_output_of_a_command/
-vim.api.nvim_create_user_command('Redir', function(ctx)
-    -- I find I can successfully dump messages to a file with:
-    -- :redir >~/tmp.txt
-    -- :silent messages
-    -- :redir end
-    -- Maybe there's some way to do that nicely with Vim script?
-    local output = vim.api.nvim_exec2(ctx.args, { output = true })
-    vim.print(output)
-    local lines = vim.split(output.output, '\n')
-    vim.cmd('new')
-    vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
-    vim.opt_local.modified = false
-end, { nargs = '+', complete = 'command' })
+vim.api.nvim_create_user_command("Redir", function(ctx)
+	-- I find I can successfully dump messages to a file with:
+	-- :redir >~/tmp.txt
+	-- :silent messages
+	-- :redir end
+	-- Maybe there's some way to do that nicely with Vim script?
+	local output = vim.api.nvim_exec2(ctx.args, { output = true })
+	vim.print(output)
+	local lines = vim.split(output.output, "\n")
+	vim.cmd("new")
+	vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+	vim.opt_local.modified = false
+end, { nargs = "+", complete = "command" })
 
 -- Gives Neovim a place to add custom spelling words (bound to 'zg')
-vim.o.spellfile = vim.fn.stdpath("config") .. "/dictionary.utf-8.add" 
+vim.o.spellfile = vim.fn.stdpath("config") .. "/dictionary.utf-8.add"
 
 -- Required by the scope plugin to add globals. The rest is the defaults.
 vim.opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,terminal,globals"

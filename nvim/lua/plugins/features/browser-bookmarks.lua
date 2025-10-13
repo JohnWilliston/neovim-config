@@ -9,6 +9,7 @@ end
 return {
     "dhruvmanila/browser-bookmarks.nvim",
     version = "*",
+    -- FIX: Find a better way to handle across platforms/devices/accounts.
     -- Only required to override the default options
     opts = {
         profile_name = "DEFCON",

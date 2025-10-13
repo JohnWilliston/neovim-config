@@ -4,6 +4,177 @@ local is_git_repo = function() return configutils.is_git_repo() end
 -- local is_git_repo = function() return Snacks.git.get_root() ~= nil end
 local github_cli_found = function() return vim.fn.executable("gh") ~= 0 end
 
+-- This is my overly complicated dashboard set of sections. I'm keeping it for
+-- possible future use, but for now...
+local complex_dashboard_sections = {
+    { section = "header" },
+    -- {
+    --     pane = 2,
+    --     section = "terminal",
+    --     --cmd = "colorscript -e square",    -- Not on Windows
+    --     height = 5,
+    --     padding = 1,
+    -- },
+    { section = "keys", gap = 1, padding = 1 },
+    {
+        pane = 2,
+        icon = " ",
+        title = "Recent Files",
+        section = "recent_files",
+        indent = 2,
+        padding = 1,
+        limit = (github_cli_found() and is_git_repo()) and 5 or 20,
+    },
+    {
+        pane = 2,
+        icon = " ",
+        title = "Projects",
+        section = "projects",
+        indent = 2,
+        padding = 1,
+        limit = (github_cli_found() and is_git_repo()) and 5 or 10,
+    },
+    -- {
+    --     pane = 2,
+    --     icon = " ",
+    --     title = "Git Status",
+    --     section = "terminal",
+    --     enabled = function()
+    --         return Snacks.git.get_root() ~= nil
+    --     end,
+    --     cmd = "git status --short --branch --renames",
+    --     height = 5,
+    --     padding = 1,
+    --     ttl = 5 * 60,
+    --     indent = 3,
+    -- },
+
+    -- BUG: This option still shows up sometimes on the dashboard 
+    -- when in non-git repo directories, which I don't fathom.
+    {
+        enabled = is_git_repo(),
+        pane = 2,
+        icon = " ",
+        desc = "Browse Repo",
+        padding = 1,
+        key = "b",
+        action = function()
+            Snacks.gitbrowse()
+        end,
+    },
+
+    function()
+        local in_git = Snacks.git.get_root() ~= nil
+        local cmds = {
+            {
+                enabled = github_cli_found(),
+                icon = " ",
+                title = "GitHub Account",
+                cmd = "gh auth status --active",
+                height = 3,
+                key = "S",
+                ttl = 0,    -- Gets rid of caching for this data.
+                action = function ()
+                    vim.fn.jobstart("gh auth switch")
+                    Snacks.dashboard.update()
+                end
+            },
+            {
+                enabled = github_cli_found(),
+                title = "Notifications",
+                cmd = "gh notify -s -a -n3",
+                action = function()
+                    vim.ui.open("https://github.com/notifications")
+                end,
+                key = "N",
+                icon = " ",
+                height = 3,
+                ttl = 30,
+            },
+            {
+                icon = " ",
+                title = "Git Status",
+                section = "terminal",
+                enabled = in_git,
+                cmd = "git status --short --branch --renames",
+                height = 5,
+                padding = 1,
+                ttl = 5 * 60,
+                indent = 3,
+            },
+            {
+                enabled = is_git_repo() and github_cli_found(),
+                title = "Open Issues",
+                cmd = "gh issue list -L 3",
+                key = "i",
+                action = function()
+                    vim.fn.jobstart("gh issue list --web", { detach = true })
+                end,
+                icon = " ",
+                height = 3,
+                ttl = 30,
+            },
+            {
+                enabled = is_git_repo() and github_cli_found(),
+                icon = " ",
+                title = "Open PRs",
+                cmd = "gh pr list -L 3",
+                key = "P",
+                action = function()
+                    vim.fn.jobstart("gh pr list --web", { detach = true })
+                end,
+                height = 3,
+                ttl = 30,
+            },
+            -- {
+            --     icon = " ",
+            --     title = "Git Status",
+            --     cmd = "git --no-pager diff --stat -B -M -C",
+            --     height = 10,
+            -- },
+
+        }
+        return vim.tbl_map(function(cmd)
+            return vim.tbl_extend("force", {
+                pane = 2,
+                section = "terminal",
+                enabled = github_cli_found(),
+                padding = 1,
+                ttl = 5 * 60,
+                indent = 3,
+            }, cmd)
+        end, cmds)
+    end,
+
+    { section = "startup" },
+
+}
+
+-- ...I prefer the following much simpler (and faster) set of sections.
+local simple_dashboard_sections = {
+    { section = "header" },
+    { section = "keys", gap = 1, padding = 1 },
+    {
+        pane = 2,
+        icon = " ",
+        title = "Recent Files",
+        section = "recent_files",
+        indent = 2,
+        padding = 1,
+        limit = 20,
+    },
+    {
+        pane = 2,
+        icon = " ",
+        title = "Projects",
+        section = "projects",
+        indent = 2,
+        padding = 1,
+        limit = 10,
+    },
+    { section = "startup" },
+}
+
 return {
     "folke/snacks.nvim",
     enabled = true,
@@ -25,7 +196,7 @@ return {
 
                 -- Create some toggle mappings
                 Snacks.toggle.animate():map("<leader>ua")
-                -- My own custom global used by the nvim-cmp plugin.
+                -- Custom buffer variable used by the nvim-cmp plugin.
                 Snacks.toggle({ 
                     name = "Completion", 
                     -- get = function() return vim.g.cmp end,
@@ -39,6 +210,66 @@ return {
                         -- cmp.setup.buffer({ enabled = state })
                     end,
                 }):map("<leader>uc")
+                -- Custom toggle based on whether gitsigns shows signs.
+                Snacks.toggle({ 
+                    name = "Signs", 
+                    get = function() 
+                        return require("gitsigns.config").config.signcolumn
+                    end,
+                    set = function(state) 
+                        require("gitsigns").toggle_signs(state)
+                    end,
+                }):map("<leader>uvs")
+                -- Custom toggle based on whether gitsigns highlights lines.
+                Snacks.toggle({ 
+                    name = "Highlight lines", 
+                    get = function() 
+                        return require("gitsigns.config").config.linehl
+                    end,
+                    set = function(state) 
+                        require("gitsigns").toggle_linehl(state)
+                    end,
+                }):map("<leader>uvl")
+                -- Custom toggle based on whether gitsigns highlights lines.
+                Snacks.toggle({ 
+                    name = "Highlight line numbers", 
+                    get = function() 
+                        return require("gitsigns.config").config.numhl
+                    end,
+                    set = function(state) 
+                        require("gitsigns").toggle_numhl(state)
+                    end,
+                }):map("<leader>uvn")
+                -- Custom toggle based on whether gitsigns shows line blame.
+                Snacks.toggle({ 
+                    name = "Current line blame", 
+                    get = function() 
+                        return require("gitsigns.config").config.current_line_blame
+                    end,
+                    set = function(state) 
+                        require("gitsigns").toggle_current_line_blame(state)
+                    end,
+                }):map("<leader>uvb")
+                -- Custom toggle based on whether gitsigns shows deleted lines.
+                Snacks.toggle({ 
+                    name = "Deleted lines", 
+                    get = function() 
+                        return require("gitsigns.config").config.show_deleted
+                    end,
+                    set = function(state) 
+                        require("gitsigns").toggle_deleted(state)
+                    end,
+                }):map("<leader>uvd")
+                -- Custom toggle based on whether gitsigns shows word diff.
+                Snacks.toggle({ 
+                    name = "Word diff", 
+                    get = function() 
+                        return require("gitsigns.config").config.word_diff
+                    end,
+                    set = function(state) 
+                        require("gitsigns").toggle_word_diff(state)
+                    end,
+                }):map("<leader>uvw")
                 Snacks.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 }):map("<leader>ue")
                 Snacks.toggle.diagnostics():map("<leader>ud")
                 Snacks.toggle.inlay_hints():map("<leader>uh")
@@ -59,10 +290,10 @@ return {
         { "<leader>fe", function() Snacks.explorer.open() end, desc = "File explorer", mode = "n" },
         { "<leader>fr", function() Snacks.explorer.reveal() end, desc = "File reveal", mode = "n" },
         { "<leader>lg", function() Snacks.lazygit() end, desc = "LazyGit", mode = "n" },
-        -- I decided to use the bbye plugin for this more heavily used feature.
-        --{ "<leader>bd", function() Snacks.bufdelete() end, desc = "Buffer delete", mode = "n" },
-        -- { "<leader>ba", function() Snacks.bufdelete.all() end, desc = "Buffer delete all", mode = "n" },
-        -- { "<leader>bo", function() Snacks.bufdelete.other() end, desc = "Buffer delete other", mode = "n" },
+        -- I previously used the bbye plugin for this heavily used feature.
+        { "<leader>bd", function() Snacks.bufdelete() end, desc = "Buffer delete", mode = "n" },
+        { "<leader>ba", function() Snacks.bufdelete.all() end, desc = "Buffer delete all", mode = "n" },
+        { "<leader>bo", function() Snacks.bufdelete.other() end, desc = "Buffer delete other", mode = "n" },
         -- Interesting illustration of using the window snack.
         {
             "<leader>N",
@@ -84,7 +315,6 @@ return {
         },
         { "<leader>bs", function() Snacks.scratch() end, desc = "Toggle scratch buffer" },
         { "<leader>bS", function() Snacks.scratch.select() end, desc = "Select scratch buffer" },
-        { "<leader>vl", function () Snacks.lazygit.log() end, desc = "Git log" },
 
         -- Pickers
         { "<leader>S ", function() Snacks.picker.buffers() end, desc = "Search buffers" },
@@ -125,14 +355,15 @@ return {
         { "<leader>uC", function() Snacks.picker.colorschemes() end, desc = "Colorschemes" },
 
         -- git
-        { "<leader>gb", function() Snacks.picker.git_branches() end, desc = "Git Branches" },
-        { "<leader>gd", function() Snacks.picker.git_diff() end, desc = "Git Diff (Hunks)" },
-        { "<leader>gf", function() Snacks.picker.git_files() end, desc = "Find Git Files" },
-        { "<leader>gF", function() Snacks.picker.git_log_file() end, desc = "Git Log File" },
-        { "<leader>gl", function() Snacks.picker.git_log() end, desc = "Git Log" },
-        { "<leader>gL", function() Snacks.picker.git_log_line() end, desc = "Git Log Line" },
-        { "<leader>gs", function() Snacks.picker.git_status() end, desc = "Git Status" },
-        { "<leader>gS", function() Snacks.picker.git_stash() end, desc = "Git Stash" },
+        -- { "<leader>gb", function() Snacks.picker.git_branches() end, desc = "Git Branches" },
+        -- { "<leader>gd", function() Snacks.picker.git_diff() end, desc = "Git Diff (Hunks)" },
+        -- { "<leader>gf", function() Snacks.picker.git_files() end, desc = "Find Git Files" },
+        -- { "<leader>gF", function() Snacks.picker.git_log_file() end, desc = "Git file history" },
+        -- { "<leader>gl", function() Snacks.picker.git_log() end, desc = "Git Log" },
+        -- { "<leader>gL", function() Snacks.picker.git_log_line() end, desc = "Git Log Line" },
+        -- { "<leader>gs", function() Snacks.picker.git_status() end, desc = "Git Status" },
+        -- { "<leader>gS", function() Snacks.picker.git_stash() end, desc = "Git Stash" },
+        { "<leader>vL", function () Snacks.lazygit.log() end, desc = "LazyGit reflog UI" },
 
         -- LSP
         { "<leader>Ld", function() Snacks.picker.lsp_definitions() end, desc = "Goto Definition" },
@@ -191,148 +422,10 @@ return {
             -- formats = {
             --     header = { "%s", align = "center" },
             -- },
-            sections = {
-                { section = "header" },
-                -- {
-                --     pane = 2,
-                --     section = "terminal",
-                --     --cmd = "colorscript -e square",    -- Not on Windows
-                --     height = 5,
-                --     padding = 1,
-                -- },
-                { section = "keys", gap = 1, padding = 1 },
-                {
-                    pane = 2,
-                    icon = " ",
-                    title = "Recent Files",
-                    section = "recent_files",
-                    indent = 2,
-                    padding = 1,
-                    limit = (github_cli_found() and is_git_repo()) and 5 or 20,
-                },
-                {
-                    pane = 2,
-                    icon = " ",
-                    title = "Projects",
-                    section = "projects",
-                    indent = 2,
-                    padding = 1,
-                    limit = (github_cli_found() and is_git_repo()) and 5 or 10,
-                },
-                -- {
-                --     pane = 2,
-                --     icon = " ",
-                --     title = "Git Status",
-                --     section = "terminal",
-                --     enabled = function()
-                --         return Snacks.git.get_root() ~= nil
-                --     end,
-                --     cmd = "git status --short --branch --renames",
-                --     height = 5,
-                --     padding = 1,
-                --     ttl = 5 * 60,
-                --     indent = 3,
-                -- },
 
-                -- BUG: This option still shows up sometimes on the dashboard 
-                -- when in non-git repo directories, which I don't fathom.
-                {
-                    enabled = is_git_repo(),
-                    pane = 2,
-                    icon = " ",
-                    desc = "Browse Repo",
-                    padding = 1,
-                    key = "b",
-                    action = function()
-                        Snacks.gitbrowse()
-                    end,
-                },
+            -- sections = complex_dashboard_sections,
+            sections = simple_dashboard_sections,
 
-                function()
-                    local in_git = Snacks.git.get_root() ~= nil
-                    local cmds = {
-                        {
-                            enabled = github_cli_found(),
-                            icon = " ",
-                            title = "GitHub Account",
-                            cmd = "gh auth status --active",
-                            height = 3,
-                            key = "S",
-                            ttl = 0,    -- Gets rid of caching for this data.
-                            action = function ()
-                                vim.fn.jobstart("gh auth switch")
-                                Snacks.dashboard.update()
-                            end
-                        },
-                        {
-                            enabled = github_cli_found(),
-                            title = "Notifications",
-                            cmd = "gh notify -s -a -n3",
-                            action = function()
-                                vim.ui.open("https://github.com/notifications")
-                            end,
-                            key = "N",
-                            icon = " ",
-                            height = 3,
-                            ttl = 30,
-                        },
-                        {
-                            icon = " ",
-                            title = "Git Status",
-                            section = "terminal",
-                            enabled = in_git,
-                            cmd = "git status --short --branch --renames",
-                            height = 5,
-                            padding = 1,
-                            ttl = 5 * 60,
-                            indent = 3,
-                        },
-                        {
-                            enabled = is_git_repo() and github_cli_found(),
-                            title = "Open Issues",
-                            cmd = "gh issue list -L 3",
-                            key = "i",
-                            action = function()
-                                vim.fn.jobstart("gh issue list --web", { detach = true })
-                            end,
-                            icon = " ",
-                            height = 3,
-                            ttl = 30,
-                        },
-                        {
-                            enabled = is_git_repo() and github_cli_found(),
-                            icon = " ",
-                            title = "Open PRs",
-                            cmd = "gh pr list -L 3",
-                            key = "P",
-                            action = function()
-                                vim.fn.jobstart("gh pr list --web", { detach = true })
-                            end,
-                            height = 3,
-                            ttl = 30,
-                        },
-                        -- {
-                        --     icon = " ",
-                        --     title = "Git Status",
-                        --     cmd = "git --no-pager diff --stat -B -M -C",
-                        --     height = 10,
-                        -- },
-
-                    }
-                    return vim.tbl_map(function(cmd)
-                        return vim.tbl_extend("force", {
-                            pane = 2,
-                            section = "terminal",
-                            enabled = github_cli_found(),
-                            padding = 1,
-                            ttl = 5 * 60,
-                            indent = 3,
-                        }, cmd)
-                    end, cmds)
-                end,
-
-                { section = "startup" },
-            },
         },
         debug = { enabled = true },
         ---@class snacks.dim.Config
