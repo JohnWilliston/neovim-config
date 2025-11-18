@@ -3,177 +3,8 @@ local configutils = require("utils.config-utils")
 local is_git_repo = function() return configutils.is_git_repo() end
 -- local is_git_repo = function() return Snacks.git.get_root() ~= nil end
 local github_cli_found = function() return vim.fn.executable("gh") ~= 0 end
-
--- This is my overly complicated dashboard set of sections. I'm keeping it for
--- possible future use, but for now...
-local complex_dashboard_sections = {
-    { section = "header" },
-    -- {
-    --     pane = 2,
-    --     section = "terminal",
-    --     --cmd = "colorscript -e square",    -- Not on Windows
-    --     height = 5,
-    --     padding = 1,
-    -- },
-    { section = "keys", gap = 1, padding = 1 },
-    {
-        pane = 2,
-        icon = " ",
-        title = "Recent Files",
-        section = "recent_files",
-        indent = 2,
-        padding = 1,
-        limit = (github_cli_found() and is_git_repo()) and 5 or 20,
-    },
-    {
-        pane = 2,
-        icon = " ",
-        title = "Projects",
-        section = "projects",
-        indent = 2,
-        padding = 1,
-        limit = (github_cli_found() and is_git_repo()) and 5 or 10,
-    },
-    -- {
-    --     pane = 2,
-    --     icon = " ",
-    --     title = "Git Status",
-    --     section = "terminal",
-    --     enabled = function()
-    --         return Snacks.git.get_root() ~= nil
-    --     end,
-    --     cmd = "git status --short --branch --renames",
-    --     height = 5,
-    --     padding = 1,
-    --     ttl = 5 * 60,
-    --     indent = 3,
-    -- },
-
-    -- BUG: This option still shows up sometimes on the dashboard 
-    -- when in non-git repo directories, which I don't fathom.
-    {
-        enabled = is_git_repo(),
-        pane = 2,
-        icon = " ",
-        desc = "Browse Repo",
-        padding = 1,
-        key = "b",
-        action = function()
-            Snacks.gitbrowse()
-        end,
-    },
-
-    function()
-        local in_git = Snacks.git.get_root() ~= nil
-        local cmds = {
-            {
-                enabled = github_cli_found(),
-                icon = " ",
-                title = "GitHub Account",
-                cmd = "gh auth status --active",
-                height = 3,
-                key = "S",
-                ttl = 0,    -- Gets rid of caching for this data.
-                action = function ()
-                    vim.fn.jobstart("gh auth switch")
-                    Snacks.dashboard.update()
-                end
-            },
-            {
-                enabled = github_cli_found(),
-                title = "Notifications",
-                cmd = "gh notify -s -a -n3",
-                action = function()
-                    vim.ui.open("https://github.com/notifications")
-                end,
-                key = "N",
-                icon = " ",
-                height = 3,
-                ttl = 30,
-            },
-            {
-                icon = " ",
-                title = "Git Status",
-                section = "terminal",
-                enabled = in_git,
-                cmd = "git status --short --branch --renames",
-                height = 5,
-                padding = 1,
-                ttl = 5 * 60,
-                indent = 3,
-            },
-            {
-                enabled = is_git_repo() and github_cli_found(),
-                title = "Open Issues",
-                cmd = "gh issue list -L 3",
-                key = "i",
-                action = function()
-                    vim.fn.jobstart("gh issue list --web", { detach = true })
-                end,
-                icon = " ",
-                height = 3,
-                ttl = 30,
-            },
-            {
-                enabled = is_git_repo() and github_cli_found(),
-                icon = " ",
-                title = "Open PRs",
-                cmd = "gh pr list -L 3",
-                key = "P",
-                action = function()
-                    vim.fn.jobstart("gh pr list --web", { detach = true })
-                end,
-                height = 3,
-                ttl = 30,
-            },
-            -- {
-            --     icon = " ",
-            --     title = "Git Status",
-            --     cmd = "git --no-pager diff --stat -B -M -C",
-            --     height = 10,
-            -- },
-
-        }
-        return vim.tbl_map(function(cmd)
-            return vim.tbl_extend("force", {
-                pane = 2,
-                section = "terminal",
-                enabled = github_cli_found(),
-                padding = 1,
-                ttl = 5 * 60,
-                indent = 3,
-            }, cmd)
-        end, cmds)
-    end,
-
-    { section = "startup" },
-
-}
-
--- ...I prefer the following much simpler (and faster) set of sections.
-local simple_dashboard_sections = {
-    { section = "header" },
-    { section = "keys", gap = 1, padding = 1 },
-    {
-        pane = 2,
-        icon = " ",
-        title = "Recent Files",
-        section = "recent_files",
-        indent = 2,
-        padding = 1,
-        limit = 20,
-    },
-    {
-        pane = 2,
-        icon = " ",
-        title = "Projects",
-        section = "projects",
-        indent = 2,
-        padding = 1,
-        limit = 10,
-    },
-    { section = "startup" },
-}
+-- Needs to be same as in keymaps.
+local terminal_shell = vim.loop.os_uname().sysname == "Windows_NT" and "tcc.exe" or vim.o.shell
 
 return {
     "folke/snacks.nvim",
@@ -181,7 +12,8 @@ return {
     priority = 1000,
     lazy = false,
     init = function()
-        --vim.g.snacks_animate = false
+        -- The global value for enabling/disabling Snacks animation.
+        vim.g.snacks_animate = false
         vim.api.nvim_create_autocmd("User", {
             pattern = "VeryLazy",
             callback = function()
@@ -317,62 +149,64 @@ return {
         { "<leader>bS", function() Snacks.scratch.select() end, desc = "Select scratch buffer" },
 
         -- Pickers
-        { "<leader>S ", function() Snacks.picker.buffers() end, desc = "Search buffers" },
-        { "<leader>S.", function() Snacks.picker.resume() end, desc = "Resume" },
-        { '<leader>S"', function() Snacks.picker.registers() end, desc = "Registers" },
-        { "<leader>S:", function() Snacks.picker.command_history() end, desc = "Command History" },
-        { '<leader>S/', function() Snacks.picker.search_history() end, desc = "Search History" },
-        { "<leader>S?", function() Snacks.picker.help() end, desc = "Help Pages" },
-        { "<leader>Sa", function() Snacks.picker.autocmds() end, desc = "Autocmds" },
-        { "<leader>Sb", function() Snacks.picker.lines() end, desc = "Buffer Lines" },
-        { "<leader>SB", function() Snacks.picker.grep_buffers() end, desc = "Grep Open Buffers" },
-        { "<leader>Sc", function() Snacks.picker.files({ cwd = vim.fn.stdpath("config") }) end, desc = "Find Config File" },
-        { "<leader>SC", function() Snacks.picker.commands() end, desc = "Commands" },
-        { "<leader>Sd", function() Snacks.picker.diagnostics_buffer() end, desc = "Buffer Diagnostics" },
-        { "<leader>SD", function() Snacks.picker.diagnostics() end, desc = "Diagnostics" },
-        { "<leader>Se", function() Snacks.explorer() end, desc = "File Explorer" },
-        { "<leader>Sf", function() Snacks.picker.smart() end, desc = "Search files" },
-        { "<leader>SF", function() Snacks.picker.files() end, desc = "Find Files" },    -- What's the difference?
-        { "<leader>Sg", function() Snacks.picker.grep() end, desc = "Grep" },
-        { "<leader>Si", function() Snacks.picker.icons() end, desc = "Icons" },
-        { "<leader>Sj", function() Snacks.picker.jumps() end, desc = "Jumps" },
-        { "<leader>Sk", function() Snacks.picker.keymaps() end, desc = "Keymaps" },
-        { "<leader>Sl", function() Snacks.picker.loclist() end, desc = "Location List" },
-        { "<leader>SL", function() Snacks.picker.highlights() end, desc = "Highlights" },
+        { "<leader><leader>", function() Snacks.picker.buffers() end, desc = "Search buffers" },
+        { "<leader>s.", function() Snacks.picker.resume() end, desc = "Search . repeat" },
+        { '<leader>s"', function() Snacks.picker.registers() end, desc = "Search registers" },
+        { "<leader>s:", function() Snacks.picker.command_history() end, desc = "Search command history" },
+        { '<leader>s/', function() Snacks.picker.search_history() end, desc = "Search search history" },
+        { "<leader>s?", function() Snacks.picker.help() end, desc = "Search help pages" },
+        { "<leader>sa", function() Snacks.picker.autocmds() end, desc = "Search autocmds" },
+        { "<leader>sb", function() Snacks.picker.lines() end, desc = "Search this buffer's lines" },
+        { "<leader>sB", function() Snacks.picker.grep_buffers() end, desc = "Search buffers via grep" },
+        { "<leader>sC", function() Snacks.picker.files({ cwd = vim.fn.stdpath("config") }) end, desc = "Search config files" },
+        { "<leader>sc", function() Snacks.picker.commands() end, desc = "Search commands" },
+        { "<leader>sd", function() Snacks.picker.diagnostics_buffer() end, desc = "Search buffer diagnostics" },
+        { "<leader>sD", function() Snacks.picker.diagnostics() end, desc = "Search all diagnostics" },
+        { "<leader>se", function() Snacks.explorer() end, desc = "File explorer" },
+        { "<leader>sf", function() Snacks.picker.smart() end, desc = "Search files (smart)" },
+        { "<leader>sF", function() Snacks.picker.files() end, desc = "Search files" },    -- What's the difference?
+        { "<leader>sg", function() Snacks.picker.grep() end, desc = "Search via grep" },
+        { "<leader>sG", function() Snacks.picker.lazy() end, desc = "Search for plugin spec" },
+        { "<leader>si", function() Snacks.picker.icons() end, desc = "Search icons" },
+        { "<leader>sj", function() Snacks.picker.jumps() end, desc = "Search jumplist" },
+        { "<leader>sk", function() Snacks.picker.keymaps() end, desc = "Search keymaps" },
+        { "<leader>sl", function() Snacks.picker.loclist() end, desc = "Search location List" },
+        { "<leader>sL", function() Snacks.picker.highlights() end, desc = "Search highlights" },
         -- NOTE: I'm reserving "leader<sm>" for searching whatever marks tool (harpoon, grapple, etc.) I like best.
         -- { "<leader>Sm", function() Snacks.picker.man() end, desc = "Man Pages" },
-        { "<leader>SM", function() Snacks.picker.marks() end, desc = "Marks" },
-        { "<leader>Sn", function() Snacks.picker.notifications() end, desc = "Notification History" },
-        { "<leader>So", function() Snacks.picker.recent() end, desc = "Recent" },
-        { "<leader>Sp", function() Snacks.picker.projects() end, desc = "Projects" },
-        { "<leader>SP", function() Snacks.picker() end, desc = "Pickers" },
-        { "<leader>Sq", function() Snacks.picker.qflist() end, desc = "Quickfix List" },
-        { "<leader>Sr", function() Snacks.picker.registers() end, desc = "Registers" },
-        { "<leader>Ss", function() Snacks.picker.lazy() end, desc = "Search for Plugin Spec" },
-        { "<leader>Su", function() Snacks.picker.undo() end, desc = "Undo History" },
-        { "<leader>Sw", function() Snacks.picker.grep_word() end, desc = "Visual selection or word", mode = { "n", "x" } },
+        { "<leader>sM", function() Snacks.picker.marks() end, desc = "Search marks" },
+        { "<leader>sn", function() Snacks.picker.notifications() end, desc = "Search notification history" },
+        { "<leader>so", function() Snacks.picker.recent() end, desc = "Search recent files" },
+        { "<leader>sp", function() Snacks.picker.projects() end, desc = "Search projects" },
+        { "<leader>sP", function() Snacks.picker() end, desc = "Search pickers" },
+        { "<leader>sq", function() Snacks.picker.qflist() end, desc = "Search quickfix list" },
+        { "<leader>ss", function() Snacks.picker.spelling() end, desc = "Search spelling suggestions" },
+        { "<leader>st", function() Snacks.picker.todo_comments() end, desc = "Search for todo comments" },
+        { "<leader>su", function() Snacks.picker.undo() end, desc = "Search undo history" },
+        { "<leader>sw", function() Snacks.picker.grep_word() end, desc = "Search visual selection or word", mode = { "n", "x" } },
+        { "<leader>t\\", function() Snacks.terminal.toggle() end, desc = "Toggle Terminal1 (popup)" },
 
-        { "<leader>uC", function() Snacks.picker.colorschemes() end, desc = "Colorschemes" },
+        { "<leader>uC", function() Snacks.picker.colorschemes() end, desc = "Search colorschemes" },
 
-        -- git
-        -- { "<leader>gb", function() Snacks.picker.git_branches() end, desc = "Git Branches" },
-        -- { "<leader>gd", function() Snacks.picker.git_diff() end, desc = "Git Diff (Hunks)" },
-        -- { "<leader>gf", function() Snacks.picker.git_files() end, desc = "Find Git Files" },
-        -- { "<leader>gF", function() Snacks.picker.git_log_file() end, desc = "Git file history" },
-        -- { "<leader>gl", function() Snacks.picker.git_log() end, desc = "Git Log" },
-        -- { "<leader>gL", function() Snacks.picker.git_log_line() end, desc = "Git Log Line" },
-        -- { "<leader>gs", function() Snacks.picker.git_status() end, desc = "Git Status" },
-        -- { "<leader>gS", function() Snacks.picker.git_stash() end, desc = "Git Stash" },
-        { "<leader>vL", function () Snacks.lazygit.log() end, desc = "LazyGit reflog UI" },
+        -- Version control (Git)
+        { "<leader>vb", function() Snacks.picker.git_branches() end, desc = "Search Git branches" },
+        { "<leader>vd", function() Snacks.picker.git_diff() end, desc = "Search Git diff (hunks)" },
+        { "<leader>vf", function() Snacks.picker.git_files() end, desc = "Search Find git files" },
+        { "<leader>vF", function() Snacks.picker.git_log_file() end, desc = "Search Git file history" },
+        { "<leader>vl", function() Snacks.picker.git_log() end, desc = "Search Git log" },
+        { "<leader>vL", function() Snacks.picker.git_log_line() end, desc = "Search Git log line" },
+        { "<leader>vs", function() Snacks.picker.git_status() end, desc = "Search Git status" },
+        { "<leader>vS", function() Snacks.picker.git_stash() end, desc = "Search Git stash" },
+        { "<leader>vL", function () Snacks.lazygit.log() end, desc = "Search LazyGit reflog UI" },
 
         -- LSP
-        { "<leader>Ld", function() Snacks.picker.lsp_definitions() end, desc = "Goto Definition" },
-        { "<leader>LD", function() Snacks.picker.lsp_declarations() end, desc = "Goto Declaration" },
-        { "<leader>Lr", function() Snacks.picker.lsp_references() end, nowait = true, desc = "References" },
-        { "<leader>LI", function() Snacks.picker.lsp_implementations() end, desc = "Goto Implementation" },
-        { "<leader>Ly", function() Snacks.picker.lsp_type_definitions() end, desc = "Goto T[y]pe Definition" },
-        { "<leader>Ls", function() Snacks.picker.lsp_symbols() end, desc = "LSP Symbols" },
-        { "<leader>LS", function() Snacks.picker.lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
+        { "<leader>ld", function() Snacks.picker.lsp_definitions() end, desc = "Goto definition" },
+        { "<leader>lD", function() Snacks.picker.lsp_declarations() end, desc = "Goto declaration" },
+        { "<leader>lr", function() Snacks.picker.lsp_references() end, nowait = true, desc = "LSP references" },
+        { "<leader>lI", function() Snacks.picker.lsp_implementations() end, desc = "Goto implementation" },
+        { "<leader>ly", function() Snacks.picker.lsp_type_definitions() end, desc = "Goto t[y]pe definition" },
+        { "<leader>ls", function() Snacks.picker.lsp_symbols() end, desc = "LSP symbols" },
+        { "<leader>lS", function() Snacks.picker.lsp_workspace_symbols() end, desc = "LSP workspace symbols" },
     },
     ---@type snacks.Config
     opts = {
@@ -422,9 +256,30 @@ return {
             -- formats = {
             --     header = { "%s", align = "center" },
             -- },
-
-            -- sections = complex_dashboard_sections,
-            sections = simple_dashboard_sections,
+            -- I used to have a much more complicated setup. This is better.
+            sections = {
+                { section = "header" },
+                { section = "keys", gap = 1, padding = 1 },
+                {
+                    pane = 2,
+                    icon = " ",
+                    title = "Recent Files",
+                    section = "recent_files",
+                    indent = 2,
+                    padding = 1,
+                    limit = 20,
+                },
+                {
+                    pane = 2,
+                    icon = " ",
+                    title = "Projects",
+                    section = "projects",
+                    indent = 2,
+                    padding = 1,
+                    limit = 10,
+                },
+                { section = "startup" },
+            }
 
         },
         debug = { enabled = true },
@@ -452,6 +307,11 @@ return {
             filter = function(buf)
                 return vim.g.snacks_dim ~= false and vim.b[buf].snacks_dim ~= false and vim.bo[buf].buftype == ""
             end,
+        },
+        -- This is where you set file explorer behavior options and such.
+        -- NB: The files selected and shown are in the picker options.
+        explorer = {
+            trash = true,
         },
         gitbrowse = { 
             enabled = true,
@@ -562,13 +422,34 @@ return {
         lazygit = {
             enabled = true,
         },
-
+        -- The pickers have some of their properties configured here separately
+        -- for searching files, text (i.e., grep), and the file explorer. Their
+        -- layouts are also defined here, which is very powerful. See:
+        -- https://deepwiki.com/folke/snacks.nvim/5.2-notification-system
         picker = {
-            enabled = true,
-            -- Tried this as a workaround for the flashing cursor issue. Failed.
-            -- explorer = {
-            --     watch = false,
-            -- },
+            layouts = {
+                default = {
+                    layout = {
+                        box = "vertical",
+                        width = 0.9,
+                        min_width = 120,
+                        height = 0.9,
+                        { win = "preview", title = "{preview}", border = "rounded", height = 0.7 },
+                        {
+                            box = "vertical",
+                            border = "rounded",
+                            title = "{title} {live} {flags}",
+                            { win = "list", border = "none" },
+                            { win = "input", height = 1, border = "top" },
+                        },
+                    },
+                },
+            },
+            sources = {
+                files = { hidden = true },
+                grep = { hidden = true },
+                explorer = { hidden = true },
+            },
         },
 
         --notifier = { enabled = true },
@@ -578,19 +459,26 @@ return {
             -- Neovide has its own smooth scrolling, so leave it disabled.
             enabled = not vim.g.neovide,
             animate = {
-                duration = { step = 10, total = 100 },
+                duration = { step = 10, total = 50 },
                 easing = "linear",
             },
             -- faster animation when repeating scroll after delay
             animate_repeat = {
                 delay = 100, -- delay in ms before using the repeat animation
-                duration = { step = 5, total = 50 },
+                duration = { step = 2, total = 25 },
                 easing = "linear",
             },
             -- what buffers to animate
             filter = function(buf)
                 return vim.g.snacks_scroll ~= false and vim.b[buf].snacks_scroll ~= false and vim.bo[buf].buftype ~= "terminal"
             end,
+        },
+        terminal = {
+            shell = terminal_shell,
+            win = { style = "float" },
+            -- override = {
+            --     position = "float",
+            -- },
         },
         ---@class snacks.toggle.Config
         ---@field icon? string|{ enabled: string, disabled: string }

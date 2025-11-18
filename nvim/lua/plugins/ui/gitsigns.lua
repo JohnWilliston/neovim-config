@@ -86,9 +86,6 @@ return {
             [9]   = "₉",
             ["+"] = "₊",
         },
-        -- NOTE: This is apparently deprecated, but I still prefer it enabled.
-        -- I imagine it will stop working someday.
-        show_deleted = true,
         on_attach = function(bufnr)
             local gs = package.loaded.gitsigns
 

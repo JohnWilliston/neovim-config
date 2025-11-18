@@ -17,7 +17,6 @@ return {
             "diff",
             "disassembly",
             "dockerfile",
-            "doxygen",
             "gdscript",
             "go",
             "html",
@@ -39,7 +38,7 @@ return {
             "zig",
         },
         sync_install = false,
-        auto_install = true,
+        auto_install = false,
         highlight = {
             enable = true,
             disable = {}, -- List of languages that will be disabled.

@@ -5,7 +5,6 @@ local platform_windows = "Windows_NT"
 local platform_macos = "Darwin"
 
 -- System host names.
-local hostname_barliman = "Barliman.lan"
 local hostname_gandalf = "Gandalf"
 local hostname_eomer = "Eomer.local"
 
@@ -15,8 +14,8 @@ M.whaler = {
 		hostname = hostname_gandalf,
 		directories = {
 			{ path = "E:\\Src", alias = "Personal", key = "p" },
-			{ path = "E:\\DEFCON", alias = "Work", key = "w" },
 			{ path = "~/Dropbox", alias = "Dropbox", key = "d" },
+			{ path = "~/Documents/Obsidian", alias = "Obsidian", key = "o" },
 		},
 		oneoff_directories = {
 			{ path = "~/AppData/Local/nvim", alias = "Nvim Config", key = "c" },
@@ -25,21 +24,10 @@ M.whaler = {
 	},
 	{
 		platform = platform_macos,
-		hostname = hostname_barliman,
-		directories = {
-			{ path = "~/src", alias = "Personal", key = "p" },
-			{ path = "~/DEFCON", alias = "Work", key = "w" },
-		},
-		oneoff_directories = {
-			{ path = "~/.config/nvim", alias = "Nvim Config", key = "c" },
-			{ path = "~/.local/share", alias = "Nvim Data", key = "D" },
-		},
-	},
-	{
-		platform = platform_macos,
 		hostname = hostname_eomer,
 		directories = {
 			{ path = "~/src", alias = "Personal", key = "p" },
+			{ path = "~/Documents/Obsidian", alias = "Obsidian", key = "o" },
 		},
 		oneoff_directories = {
 			{ path = "~/.config/nvim", alias = "Nvim Config", key = "c" },

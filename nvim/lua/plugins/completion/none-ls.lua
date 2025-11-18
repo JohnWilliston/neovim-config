@@ -29,14 +29,14 @@ return {
 				-- null_ls.builtins.diagnostics.cppcheck,   -- Can't run
 				null_ls.builtins.diagnostics.dotenv_linter,
 				null_ls.builtins.diagnostics.markdownlint,
-				null_ls.builtins.diagnostics.npm_groovy_lint,
+				-- null_ls.builtins.diagnostics.npm_groovy_lint,
 				null_ls.builtins.diagnostics.pylint,     -- Too noisy
 				--null_ls.builtins.diagnostics.selene,     -- Too noisy
 				-- null_ls.builtins.diagnostics.spectral,   -- Can't run
-				null_ls.builtins.diagnostics.sqlfluff.with({
-					extra_args = { "--dialect", "postgres" },
-				}),
-				null_ls.builtins.diagnostics.stylelint,
+				-- null_ls.builtins.diagnostics.sqlfluff.with({
+				-- 	extra_args = { "--dialect", "postgres" },
+				-- }),
+				-- null_ls.builtins.diagnostics.stylelint,
 				null_ls.builtins.diagnostics.terraform_validate,
 				null_ls.builtins.diagnostics.tfsec,
 				-- null_ls.builtins.diagnostics.yamllint,   -- Too noisy

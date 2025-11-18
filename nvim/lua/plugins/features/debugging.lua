@@ -87,6 +87,14 @@ return {
                 end,
                 desc = "Debug step out",
             },
+            -- Telescope integration to select DAP configuration for run.
+            {
+                "<leader>s<F5>",
+                function()
+                    require('telescope').extensions.dap.configurations()
+                end,
+                desc = "Select DAP config and debug",
+            },
         },
         init = function()
             -- I ditched all the stuff I had previously written in favor of the

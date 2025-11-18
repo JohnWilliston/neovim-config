@@ -1,6 +1,9 @@
 local keymap = vim.api.nvim_set_keymap
 local term_opts = { noremap = true, silent = true }
 
+-- I thought this was a fairly clever way to use the ternary operator.
+local terminal_shell = vim.loop.os_uname().sysname == "Windows_NT" and "tcc.exe" or vim.o.shell
+
 -- Provide a binding to open the lazy plugin manager.
 keymap("n", "<leader>lz", ":Lazy<CR>", { noremap = true, silent = true, desc = "Lazy Plugin Manager" })
 
@@ -16,9 +19,8 @@ function _G.set_terminal_keymaps()
 end
 
 -- if you only want these mappings for toggle term use term://*toggleterm#* instead
--- vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
-vim.cmd("autocmd! TermOpen term://*toggleterm* lua set_terminal_keymaps()")
-
+vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
+ 
 local whichkey = require("which-key")
 local configutils = require("utils.config-utils")
 
@@ -28,6 +30,8 @@ whichkey.add({
     { "<leader>ev", "`[v`]", desc = "Select last paste" },
     { "<leader>-", "<C-W>s", desc = "Split window below" },
     { "<leader>|", "<C-W>v", desc = "Split window right" },
+    { "<leader><C-x>", "<C-W>s", desc = "Split window below" },
+    { "<leader><C-v>", "<C-W>v", desc = "Split window right" },
     { "<leader>qq", "<cmd>qa<cr>", desc = "Quit all" },
     -- Adds vertical centering to moving half a page up and down.
     { "<C-u>", "<C-u>zz", desc = "Half page up and center" },
@@ -101,6 +105,13 @@ whichkey.add({
     { "<leader>S", group = "Search (Snacks)", icon = "" },
 
     { "<leader>t", group = "Tools" },
+    -- Popup terminal is provided now by snacks.
+    -- { "<leader>t\\", "<cmd>1ToggleTerm direction=float name=Popup<cr>",            desc = "Terminal1 (Popup)" },
+    { "<leader>t-",  "<cmd>hor te " .. terminal_shell .. "<cr>", desc = "Terminal2 (Horizontal)" },
+    { "<leader>t|",  "<cmd>vert te " .. terminal_shell .. "<cr>",      desc = "Terminal3 (Vertical)" },
+    { "<leader>tt",  "<cmd>tabnew <bar> te " .. terminal_shell .. "<cr>",                desc = "Terminal4 (Tab)" },
+    -- { "<leader>tx",  "<cmd>ToggleTermSendCurrentLine 1<cr>",                       desc = "Send Line to Popup Terminal" },
+
     { "<leader>ty", group = "Yazi" },
     { "<leader>tk", group = "Kulala" },
     { "<leader>tu", group = "Curl" },

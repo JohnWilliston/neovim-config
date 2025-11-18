@@ -1,5 +1,8 @@
 -- Before this will work properly, you need to run the following Neovim command:
---  :lazy build markdown-preview.nvim
+--
+--  :Lazy build markdown-preview.nvim
+--
+-- And note well the case sensitivity on the :Lazy command!
 return {
     "iamcco/markdown-preview.nvim",
     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },

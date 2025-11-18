@@ -19,11 +19,11 @@ return {
 			{ "<leader>pln", "<cmd>WorkspacesList<CR>", desc = "Project list names" },
 			{ "<leader>pld", "<cmd>WorkspacesListDirs<CR>", desc = "Project list dirs" },
 			{ "<leader>po", "<cmd>WorkspacesOpen<CR>", desc = "Project open" },
-			{ "<leader>ps", "<cmd>SessionSave<CR>", desc = "Project save session" },
+			{ "<leader>ps", "<cmd>AutoSession save<CR>", desc = "Project save session" },
 		},
 		opts = {
 			hooks = {
-				open = { "SessionRestore" }, -- Calls the auto-session plugin.
+				open = { "AutoSession restore" }, -- Calls the auto-session plugin.
 			},
 		},
 	},
@@ -47,25 +47,25 @@ return {
 			-- code here worked better than the auto-session configuration I
 			-- tried in the scope plugin spec. Go figure.
 			pre_save_cmds = {
-				"ScopeSaveState",
+				-- "ScopeSaveState",
 			},
 			pre_restore_cmds = {
 				-- might not be necessary, but save current harpoon data when we're about to restore a session
-				function()
-					require("harpoon"):sync()
-				end,
+				-- function()
+				-- 	require("harpoon"):sync()
+				-- end,
 			},
 			post_restore_cmds = {
-				function()
-					-- vim.notify('calling harpoon sync after restore')
-					local harpoon = require("harpoon")
-					local hdata = require("harpoon.data")
-
-					-- this is the only way i found to force harpoon to reread data from the disk rather
-					-- than using what's in memory
-					require("harpoon").data = hdata.Data:new(harpoon.config)
-				end,
-				"ScopeLoadState",
+				-- function()
+				-- 	-- vim.notify('calling harpoon sync after restore')
+				-- 	local harpoon = require("harpoon")
+				-- 	local hdata = require("harpoon.data")
+				--
+				-- 	-- this is the only way i found to force harpoon to reread data from the disk rather
+				-- 	-- than using what's in memory
+				-- 	require("harpoon").data = hdata.Data:new(harpoon.config)
+				-- end,
+				-- "ScopeLoadState",
 			},
 		},
 	},

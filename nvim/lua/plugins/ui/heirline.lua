@@ -765,20 +765,20 @@ return {
             },
         }
 
-        local pomodoroBlock = {
-            condition = function (self)
-                -- I found an easier way to detect the pomodoro's status.
-                return require("pomodoro").phase > 0
-                -- local status = require("pomodoro").get_pomodoro_status("🍅❌","🍅","☕")
-                -- -- I'm guessing we need characters 1 - 7 for Unicode reasons.
-                -- local active = ( string.sub(status, 1, 7) ~= "🍅❌" )
-                -- -- vim.print(string.format("pomodoro status %s is %s", status, active))
-                -- return active
-            end,
-            provider = function (self)
-                return require("pomodoro").get_pomodoro_status("🍅❌","🍅","☕") .. " "
-            end
-        }
+        -- local pomodoroBlock = {
+        --     condition = function (self)
+        --         -- I found an easier way to detect the pomodoro's status.
+        --         return require("pomodoro").phase > 0
+        --         -- local status = require("pomodoro").get_pomodoro_status("🍅❌","🍅","☕")
+        --         -- -- I'm guessing we need characters 1 - 7 for Unicode reasons.
+        --         -- local active = ( string.sub(status, 1, 7) ~= "🍅❌" )
+        --         -- -- vim.print(string.format("pomodoro status %s is %s", status, active))
+        --         -- return active
+        --     end,
+        --     provider = function (self)
+        --         return require("pomodoro").get_pomodoro_status("🍅❌","🍅","☕") .. " "
+        --     end
+        -- }
 
         local finalStatusLine = {
             hl = { fg = "fg", bg = "bg" },
@@ -797,7 +797,7 @@ return {
             aiCodeCompanionBlock,
             macroRecorderBlock,
             spellCheckBlock,
-            pomodoroBlock,
+            -- pomodoroBlock,
             --lib.component.cmd_info(cmdInfo),
             {
                 provider = "",
